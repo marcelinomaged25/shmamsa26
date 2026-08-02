@@ -8,18 +8,18 @@
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
       <div>
-        <h1 class="mb-1 fw-extrabold"><i class="fas fa-users-cog text-primary me-2"></i>{{ profile.display_name }}</h1>
-        <p class="text-muted mb-0">Members: <strong>{{ profile.members_list|default:"Alice & Bob" }}</strong> | Current Location: <span class="badge badge-soft-info"><i class="fas fa-umbrella-beach me-1"></i>{{ profile.current_island.name|default:"Start Dock" }}</span></p>
+        <h1 class="mb-1 fw-extrabold fs-2 fs-md-1"><i class="fas fa-users-cog text-primary me-2"></i>{{ profile.display_name }}</h1>
+        <p class="text-muted mb-0">Members: <strong>{{ profile.members_list|default:"Alice & Bob" }}</strong> | Location: <span class="badge badge-soft-info"><i class="fas fa-umbrella-beach me-1"></i>{{ profile.current_island.name|default:"Start Dock" }}</span></p>
       </div>
-      <div class="d-flex gap-2">
-        <a class="btn btn-outline-primary fw-bold" href="{% url 'market:team_shop' %}"><i class="fas fa-shopping-cart me-1"></i> Component Shop</a>
-        <a class="btn btn-primary fw-bold" href="{% url 'market:vehicle_assembly' %}"><i class="fas fa-tools me-1"></i> Assembly Yard</a>
+      <div class="d-flex gap-2 w-100 w-sm-auto">
+        <a class="btn btn-outline-primary fw-bold flex-fill" href="{% url 'market:team_shop' %}"><i class="fas fa-shopping-cart me-1"></i> Shop</a>
+        <a class="btn btn-primary fw-bold flex-fill" href="{% url 'market:vehicle_assembly' %}"><i class="fas fa-tools me-1"></i> Assembly Yard</a>
       </div>
     </div>
 
     <!-- Stat Metrics -->
     <div class="row g-3 mb-4">
-      <div class="col-md-3 col-6">
+      <div class="col-lg-3 col-sm-6 col-12">
         <div class="stat-card fade-in-up">
           <div class="stat-icon"><i class="fas fa-coins text-warning"></i></div>
           <div>
@@ -28,7 +28,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-3 col-6">
+      <div class="col-lg-3 col-sm-6 col-12">
         <div class="stat-card fade-in-up">
           <div class="stat-icon"><i class="fas fa-trophy text-primary"></i></div>
           <div>
@@ -37,7 +37,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-3 col-6">
+      <div class="col-lg-3 col-sm-6 col-12">
         <div class="stat-card fade-in-up">
           <div class="stat-icon"><i class="fas fa-bolt text-warning"></i></div>
           <div>
@@ -46,7 +46,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-3 col-6">
+      <div class="col-lg-3 col-sm-6 col-12">
         <div class="stat-card fade-in-up">
           <div class="stat-icon"><i class="fas fa-clock text-danger"></i></div>
           <div>

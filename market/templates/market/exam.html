@@ -29,14 +29,14 @@
         <p class="text-muted small mb-0">Submission timestamp: {{ submission.submitted_at|date:'M d, Y H:i' }}</p>
       </div>
     {% else %}
-      <div class="card hero-card border-0 p-4 p-md-5 mb-4 fade-in-up">
+      <div class="card hero-card border-0 p-3 p-md-5 mb-4 fade-in-up">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
           <div>
             <span class="badge bg-warning text-dark fw-bold mb-2">Total Points: {{ exam.total_points }}</span>
-            <h2 class="fw-bold mb-2">{{ exam.title }}</h2>
-            <p class="mb-0 col-lg-9 opacity-90">{{ exam.description }}</p>
+            <h2 class="fw-bold mb-2 fs-3 fs-md-2">{{ exam.title }}</h2>
+            <p class="mb-0 col-lg-9 opacity-90 small fs-md-6">{{ exam.description }}</p>
           </div>
-          <div class="text-center bg-dark p-3 rounded-4 border border-secondary">
+          <div class="text-center bg-dark p-3 rounded-4 border border-secondary w-100 w-sm-auto">
             <span class="text-muted small text-uppercase d-block" style="letter-spacing:.05em;">Time Remaining</span>
             <div id="examTimer" class="fs-2 fw-extrabold text-warning" data-duration="{{ exam.duration_seconds }}">--:--</div>
           </div>
