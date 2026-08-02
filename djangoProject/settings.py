@@ -38,7 +38,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # IPAddr = socket.gethostbyname(hostname)
 # ALLOWED_HOSTS = [IPAddr,'127.0.0.1']
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1 .onrender.com .railway.app").split()
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1 .onrender.com .railway.app .vercel.app").split()
 
 CSRF_TRUSTED_ORIGINS = [
     origin for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split() if origin
