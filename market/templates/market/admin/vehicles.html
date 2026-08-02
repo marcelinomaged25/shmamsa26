@@ -10,7 +10,34 @@
     <div class="row g-4">
       {% for v in vehicles %}
       <div class="col-md-6 col-lg-4">
-        <div class="card shadow-sm p-4 border-0 rounded-4 h-100">
+        <div class="card shadow-sm p-3 p-md-4 border-0 rounded-4 h-100 card-hover">
+          <!-- Vehicle Visual Image Thumbnail -->
+          <div class="card-media-wrapper mini-media-container mb-3" style="height: 140px;">
+            {% if v.image %}
+              <img src="{{ v.image.url }}" alt="{{ v.name }}" class="card-media-img">
+            {% else %}
+              <div class="text-center p-2">
+                {% if "Submarine" in v.name %}
+                  <i class="fas fa-subway media-placeholder-icon text-primary"></i>
+                {% elif "Boat" in v.name %}
+                  <i class="fas fa-ship media-placeholder-icon text-info"></i>
+                {% elif "Car" in v.name %}
+                  <i class="fas fa-car media-placeholder-icon text-success"></i>
+                {% elif "Airplane" in v.name %}
+                  <i class="fas fa-plane media-placeholder-icon text-warning"></i>
+                {% elif "Horse" in v.name %}
+                  <i class="fas fa-horse media-placeholder-icon text-danger"></i>
+                {% elif "Train" in v.name %}
+                  <i class="fas fa-train media-placeholder-icon text-purple"></i>
+                {% elif "Bicycle" in v.name %}
+                  <i class="fas fa-bicycle media-placeholder-icon text-success"></i>
+                {% else %}
+                  <i class="fas fa-car media-placeholder-icon text-primary"></i>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+
           <div class="d-flex justify-content-between align-items-center mb-2">
             <span class="badge bg-primary fs-6">Order #{{ v.progression_order }}</span>
             <span class="badge badge-soft-info">Base Time: {{ v.base_travel_time_minutes }} min</span>

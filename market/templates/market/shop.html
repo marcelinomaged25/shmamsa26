@@ -26,6 +26,29 @@
             <div class="col-12 col-md-6">
               <div class="card border rounded-4 p-3 card-hover h-100 d-flex flex-column justify-content-between">
                 <div>
+                  <!-- Visual Component Image / Banner -->
+                  <div class="card-media-wrapper item-media-container mb-3">
+                    {% if comp.image %}
+                      <img src="{{ comp.image.url }}" alt="{{ comp.name }}" class="card-media-img">
+                    {% else %}
+                      <div class="text-center p-3">
+                        {% if "Submarine" in comp.name or "Hull" in comp.name %}
+                          <i class="fas fa-ship media-placeholder-icon"></i>
+                        {% elif "Motor" in comp.name or "Engine" in comp.name %}
+                          <i class="fas fa-cogs media-placeholder-icon text-warning"></i>
+                        {% elif "Fan" in comp.name or "Wing" in comp.name %}
+                          <i class="fas fa-fan media-placeholder-icon text-info"></i>
+                        {% elif "Battery" in comp.name %}
+                          <i class="fas fa-car-battery media-placeholder-icon text-danger"></i>
+                        {% elif "Chassis" in comp.name %}
+                          <i class="fas fa-car media-placeholder-icon text-primary"></i>
+                        {% else %}
+                          <i class="fas fa-microchip media-placeholder-icon text-purple"></i>
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                  </div>
+
                   <div class="d-flex justify-content-between align-items-start mb-2">
                     <h5 class="fw-bold mb-0 text-primary">{{ comp.name }}</h5>
                     <span class="badge {% if comp.power_value == 100 %}bg-danger{% elif comp.power_value == 50 %}bg-warning text-dark{% else %}bg-secondary{% endif %} fs-7">

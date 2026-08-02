@@ -65,6 +65,33 @@
           <h4 class="section-heading mb-3">Active Vehicle Assembly</h4>
           {% if current_assembly %}
             <div class="p-3 bg-light rounded-4 border mb-3">
+              <!-- Visual Vehicle Media Banner -->
+              <div class="card-media-wrapper item-media-container mb-3">
+                {% if current_assembly.vehicle.image %}
+                  <img src="{{ current_assembly.vehicle.image.url }}" alt="{{ current_assembly.vehicle.name }}" class="card-media-img">
+                {% else %}
+                  <div class="text-center p-3">
+                    {% if "Submarine" in current_assembly.vehicle.name %}
+                      <i class="fas fa-subway media-placeholder-icon text-primary"></i>
+                    {% elif "Boat" in current_assembly.vehicle.name %}
+                      <i class="fas fa-ship media-placeholder-icon text-info"></i>
+                    {% elif "Car" in current_assembly.vehicle.name %}
+                      <i class="fas fa-car media-placeholder-icon text-success"></i>
+                    {% elif "Airplane" in current_assembly.vehicle.name %}
+                      <i class="fas fa-plane media-placeholder-icon text-warning"></i>
+                    {% elif "Horse" in current_assembly.vehicle.name %}
+                      <i class="fas fa-horse media-placeholder-icon text-danger"></i>
+                    {% elif "Train" in current_assembly.vehicle.name %}
+                      <i class="fas fa-train media-placeholder-icon text-purple"></i>
+                    {% elif "Bicycle" in current_assembly.vehicle.name %}
+                      <i class="fas fa-bicycle media-placeholder-icon text-success"></i>
+                    {% else %}
+                      <i class="fas fa-space-shuttle media-placeholder-icon text-primary"></i>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
+
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <h4 class="fw-bold mb-0 text-primary">
                   <span class="badge bg-primary me-2">#{{ current_assembly.vehicle.progression_order }}</span>
