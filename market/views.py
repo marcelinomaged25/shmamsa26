@@ -141,9 +141,37 @@ def team_dashboard(request):
 @login_required
 def team_shop(request):
     profile = get_object_or_404(Profile, user=request.user)
-    components = ComponentPowerLevel.objects.select_related('component_type').filter(stock__gt=0)
-    inventory = profile.inventory_items.select_related('power_level__component_type').filter(quantity__gt=0)
+    curr_assembly = profile.current_vehicle_assembly
     comp_state = _get_competition_state()
+    inventory = profile.inventory_items.select_related('power_level__component_type', 'power_level').filter(quantity__gt=0)
+
+    if not curr_assembly:
+        return render(request, 'market/shop.html', {
+            'profile': profile,
+            'components': [],
+            'inventory': inventory,
+            'comp_state': comp_state,
+        })
+
+    requirements = curr_assembly.vehicle.requirements.select_related('component_type').all()
+    req_type_ids = [req.component_type_id for req in requirements]
+    req_map = {req.component_type_id: req.quantity_required for req in requirements}
+
+    components_qs = ComponentPowerLevel.objects.select_related('component_type').filter(
+        stock__gt=0, 
+        component_type_id__in=req_type_ids
+    )
+    
+    allocations = curr_assembly.allocated_components.select_related('power_level__component_type').all()
+    
+    components = list(components_qs)
+    for comp in components:
+        req_qty = req_map.get(comp.component_type_id, 0)
+        owned_inv = sum(inv.quantity for inv in inventory if inv.power_level.component_type_id == comp.component_type_id)
+        owned_alloc = sum(alloc.quantity for alloc in allocations if alloc.power_level.component_type_id == comp.component_type_id)
+        comp.total_owned = owned_inv + owned_alloc
+        comp.req_qty = req_qty
+        comp.can_buy = comp.total_owned < req_qty
 
     return render(request, 'market/shop.html', {
         'profile': profile,
@@ -160,6 +188,29 @@ def buy_component(request, power_level_id):
 
     profile = get_object_or_404(Profile, user=request.user)
     comp = get_object_or_404(ComponentPowerLevel, id=power_level_id)
+    curr_assembly = profile.current_vehicle_assembly
+
+    if not curr_assembly:
+        messages.error(request, 'You have completed all vehicles and cannot purchase more components.')
+        return redirect('market:team_shop')
+
+    req = VehicleComponentRequirement.objects.filter(
+        vehicle=curr_assembly.vehicle, 
+        component_type=comp.component_type
+    ).first()
+
+    if not req:
+        messages.error(request, f'{comp.component_type.name} is not required for your current vehicle ({curr_assembly.vehicle.name}).')
+        return redirect('market:team_shop')
+
+    inventory = profile.inventory_items.select_related('power_level').all()
+    allocations = curr_assembly.allocated_components.select_related('power_level').all()
+    owned_inv = sum(inv.quantity for inv in inventory if inv.power_level.component_type_id == comp.component_type_id)
+    owned_alloc = sum(alloc.quantity for alloc in allocations if alloc.power_level.component_type_id == comp.component_type_id)
+    
+    if (owned_inv + owned_alloc) >= req.quantity_required:
+        messages.error(request, f'You have reached the maximum required quantity for {comp.component_type.name}s.')
+        return redirect('market:team_shop')
 
     if comp.stock <= 0:
         messages.error(request, 'This component is currently out of stock.')
@@ -183,6 +234,58 @@ def buy_component(request, power_level_id):
     messages.success(request, f'Successfully purchased 1x {comp.name} for ${comp.price} coins!')
     _create_notification(profile, 'Component Purchased', f'Purchased 1x {comp.name} for ${comp.price}.')
     return redirect('market:team_shop')
+
+
+@login_required
+def return_component(request, power_level_id):
+    if request.method != 'POST':
+        return redirect('market:team_dashboard')
+
+    profile = get_object_or_404(Profile, user=request.user)
+    power_level = get_object_or_404(ComponentPowerLevel, id=power_level_id)
+    curr_assembly = profile.current_vehicle_assembly
+
+    # Try inventory first
+    inv_item = profile.inventory_items.filter(power_level=power_level).first()
+    if inv_item and inv_item.quantity > 0:
+        inv_item.quantity -= 1
+        if inv_item.quantity <= 0:
+            inv_item.delete()
+        else:
+            inv_item.save()
+            
+        profile.balance += power_level.price
+        profile.save(update_fields=['balance'])
+        
+        power_level.stock += 1
+        power_level.save(update_fields=['stock'])
+        
+        messages.success(request, f'Returned 1x {power_level.name} from inventory for ${power_level.price}.')
+        return redirect(request.META.get('HTTP_REFERER', 'market:team_shop'))
+
+    # If not in inventory, try active assembly allocation
+    if curr_assembly:
+        alloc_item = curr_assembly.allocated_components.filter(power_level=power_level).first()
+        if alloc_item and alloc_item.quantity > 0:
+            alloc_item.quantity -= 1
+            if alloc_item.quantity <= 0:
+                alloc_item.delete()
+            else:
+                alloc_item.save()
+                
+            curr_assembly.recalculate_power()
+            
+            profile.balance += power_level.price
+            profile.save(update_fields=['balance'])
+            
+            power_level.stock += 1
+            power_level.save(update_fields=['stock'])
+            
+            messages.success(request, f'Returned 1x {power_level.name} from assembly for ${power_level.price}. Vehicle power recalculated.')
+            return redirect(request.META.get('HTTP_REFERER', 'market:team_shop'))
+
+    messages.error(request, f'You do not own any {power_level.name} to return.')
+    return redirect(request.META.get('HTTP_REFERER', 'market:team_shop'))
 
 
 # ---------------------------------------------------------
@@ -489,19 +592,6 @@ def admin_team_create(request):
         return redirect('market:admin_teams')
 
     return render(request, 'market/admin/team_form.html')
-
-
-@admin_required
-def admin_team_edit(request, profile_id):
-    profile = get_object_or_404(Profile, id=profile_id)
-    if request.method == 'POST':
-        profile.teamName = request.POST.get('team_name', profile.teamName)
-        profile.balance = float(request.POST.get('coins', profile.balance))
-        profile.members_list = request.POST.get('members', profile.members_list)
-        profile.save()
-        messages.success(request, f'Team "{profile.display_name}" updated successfully!')
-        return redirect('market:admin_teams')
-    return render(request, 'market/admin/team_form.html', {'team': profile})
 
 
 @admin_required

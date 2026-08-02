@@ -64,9 +64,15 @@
 
                 <form method="post" action="{% url 'market:buy_component' comp.id %}">
                   {% csrf_token %}
-                  <button type="submit" class="btn btn-primary w-100 fw-bold" {% if profile.balance < comp.price or comp.stock <= 0 %}disabled{% endif %}>
-                    <i class="fas fa-shopping-bag me-1"></i> Purchase Component
-                  </button>
+                  {% if not comp.can_buy %}
+                    <button type="button" class="btn btn-secondary w-100 fw-bold" disabled>
+                      <i class="fas fa-ban me-1"></i> Max Quantity Reached ({{ comp.total_owned }}/{{ comp.req_qty }})
+                    </button>
+                  {% else %}
+                    <button type="submit" class="btn btn-primary w-100 fw-bold" {% if profile.balance < comp.price or comp.stock <= 0 %}disabled{% endif %}>
+                      <i class="fas fa-shopping-bag me-1"></i> Purchase Component (Own {{ comp.total_owned }}/{{ comp.req_qty }})
+                    </button>
+                  {% endif %}
                 </form>
               </div>
             </div>
@@ -92,7 +98,13 @@
                   <strong class="d-block text-dark">{{ inv.power_level.name }}</strong>
                   <span class="badge badge-soft-primary small">Power: {{ inv.power_level.power_value }}</span>
                 </div>
-                <span class="badge bg-dark fs-6 px-3 py-2">x{{ inv.quantity }}</span>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge bg-dark fs-6 px-3 py-2">x{{ inv.quantity }}</span>
+                  <form method="post" action="{% url 'market:return_component' inv.power_level.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Return for ${{ inv.power_level.price }}" onsubmit="return confirm('Return this item for ${{ inv.power_level.price }}?');"><i class="fas fa-undo"></i></button>
+                  </form>
+                </div>
               </li>
               {% endfor %}
             </ul>

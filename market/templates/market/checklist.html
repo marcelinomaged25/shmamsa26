@@ -49,9 +49,15 @@
                 {% if req.allocated_items %}
                   <div class="small">
                     {% for alloc in req.allocated_items %}
-                      <div class="d-flex justify-content-between text-muted mt-1">
+                      <div class="d-flex justify-content-between align-items-center text-muted mt-1">
                         <span>{{ alloc.quantity }}x {{ alloc.power_level.name }}</span>
-                        <span class="text-dark fw-bold">+{{ alloc.power_level.power_value }} Power each</span>
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="text-dark fw-bold">+{{ alloc.power_level.power_value }} Power each</span>
+                          <form method="post" action="{% url 'market:return_component' alloc.power_level.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-1" title="Return 1x for ${{ alloc.power_level.price }}" onsubmit="return confirm('Return this item from your vehicle for ${{ alloc.power_level.price }}?');"><i class="fas fa-undo fs-7"></i></button>
+                          </form>
+                        </div>
                       </div>
                     {% endfor %}
                   </div>
