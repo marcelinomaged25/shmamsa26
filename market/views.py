@@ -482,12 +482,6 @@ def live_exam(request):
                 if is_correct:
                     earned_score += q.points
                 ExamAnswer.objects.create(submission=submission, question=q, selected_choice=choice, is_correct=is_correct)
-            elif q.question_type == 'short':
-                text_ans = request.POST.get(f'question_{q.id}', '').strip()
-                is_correct = text_ans.lower() == q.short_answer_correct.lower().strip() if q.short_answer_correct else False
-                if is_correct:
-                    earned_score += q.points
-                ExamAnswer.objects.create(submission=submission, question=q, text_answer=text_ans, is_correct=is_correct)
 
         submission.score = earned_score
         submission.save()
@@ -495,17 +489,30 @@ def live_exam(request):
         # Award coins: 10 coins per point
         coins_awarded = earned_score * 10.0
         if coins_awarded > 0:
-            profile.balance += coins_awarded
+            profile.balance += Decimal(str(coins_awarded))
             profile.save()
+            
+        session_key = f'exam_start_{exam.id}'
+        if session_key in request.session:
+            del request.session[session_key]
 
         messages.success(request, f'Exam submitted! Score: {earned_score}/{total_possible}. You earned ${coins_awarded} coins!')
         _create_notification(profile, 'Exam Completed', f'Submitted {exam.title} with score {earned_score}/{total_possible}. Earned ${coins_awarded}.')
         return redirect('market:live_exam')
 
+    session_key = f'exam_start_{exam.id}'
+    if session_key not in request.session:
+        request.session[session_key] = timezone.now().timestamp()
+        
+    start_time = request.session[session_key]
+    elapsed = timezone.now().timestamp() - start_time
+    remaining_seconds = max(0, int(exam.duration_seconds - elapsed))
+
     return render(request, 'market/exam.html', {
         'exam': exam,
         'profile': profile,
         'questions': exam.questions.prefetch_related('choices').all(),
+        'remaining_seconds': remaining_seconds,
     })
 
 

@@ -235,7 +235,6 @@ class ExamQuestion(models.Model):
     QUESTION_TYPES = [
         ('mcq', 'Multiple Choice'),
         ('tf', 'True / False'),
-        ('short', 'Short Answer'),
     ]
     DIFFICULTY_CHOICES = [
         ('easy', 'Easy'),
