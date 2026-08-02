@@ -41,7 +41,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1 .onrender.com .railway.app .vercel.app").split()
 
 CSRF_TRUSTED_ORIGINS = [
-    origin for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split() if origin
+    origin for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "https://shmamsa26.onrender.com https://*.onrender.com https://*.vercel.app").split() if origin
 ]
 
 
