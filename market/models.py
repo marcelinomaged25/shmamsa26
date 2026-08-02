@@ -139,11 +139,12 @@ class TeamVehicleAssembly(models.Model):
 
     def recalculate_power(self):
         allocations = self.allocated_components.select_related('power_level').all()
-        total_collected = sum(alloc.quantity * alloc.power_level.power_value for alloc in allocations)
-        max_power = self.vehicle.max_possible_power
         
-        self.total_power = total_collected
-        self.power_percentage = round((total_collected / max_power * 100.0), 2) if max_power > 0 else 0.0
+        total_components = sum(alloc.quantity for alloc in allocations)
+        total_power_sum = sum(alloc.quantity * alloc.power_level.power_value for alloc in allocations)
+        
+        self.total_power = total_power_sum
+        self.power_percentage = round((total_power_sum / total_components), 2) if total_components > 0 else 0.0
 
         requirements = self.vehicle.requirements.all()
         is_complete = True

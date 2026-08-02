@@ -66,16 +66,15 @@ def leaderboard(request):
             'team_name': team.display_name,
             'current_vehicle': curr_vehicle_name,
             'current_island': curr_island_name,
+            'island_order': team.current_island.order if team.current_island else 0,
             'completed_vehicles': team.completed_vehicles_count,
-            'avg_power': team.average_vehicle_power,
             'total_time': team.total_travel_time,
             'total_delay': team.total_delay,
             'coins': team.coins,
-            'score': team.current_score,
         })
     
-    # Sort by score descending, then total delay ascending
-    leaderboard_data.sort(key=lambda x: (-x['score'], x['total_delay']))
+    # Sort by Island (Descending), then Coins (Descending)
+    leaderboard_data.sort(key=lambda x: (-x['island_order'], -x['coins']))
     
     # Assign ranks
     for index, data in enumerate(leaderboard_data, 1):
@@ -103,14 +102,13 @@ def api_leaderboard(request):
             'team_name': team.display_name,
             'current_vehicle': curr_assembly.vehicle.name if curr_assembly else "Completed All",
             'current_island': team.current_island.name if team.current_island else "Start Dock",
+            'island_order': team.current_island.order if team.current_island else 0,
             'completed_vehicles': team.completed_vehicles_count,
-            'avg_power': team.average_vehicle_power,
             'total_time': team.total_travel_time,
             'total_delay': team.total_delay,
             'coins': team.coins,
-            'score': team.current_score,
         })
-    data.sort(key=lambda x: (-x['score'], x['total_delay']))
+    data.sort(key=lambda x: (-x['island_order'], -x['coins']))
     for idx, item in enumerate(data, 1):
         item['rank'] = idx
     return JsonResponse({'leaderboard': data})
@@ -413,11 +411,11 @@ def travel_island(request):
         return redirect('market:team_dashboard')
 
     # Calculate Travel Time & Delay
-    # Formula: Efficiency = Power % / 100. Actual Travel Time = Base Time / Efficiency. Delay = Actual - Base.
+    # Formula: Efficiency = Power % / 100. Delay = Base Time - (Efficiency * Base Time). Actual = Base + Delay.
     base_time = prev_assembly.vehicle.base_travel_time_minutes
-    efficiency = max(0.25, prev_assembly.power_percentage / 100.0) # min 25% efficiency floor
-    actual_time = round(base_time / efficiency, 1)
-    delay = max(0.0, round(actual_time - base_time, 1))
+    efficiency = prev_assembly.power_percentage / 100.0
+    delay = max(0.0, round(base_time - (efficiency * base_time), 1))
+    actual_time = round(base_time + delay, 1)
 
     # Log travel history
     TravelHistory.objects.create(
@@ -493,9 +491,15 @@ def live_exam(request):
 
         submission.score = earned_score
         submission.save()
+        
+        # Award coins: 10 coins per point
+        coins_awarded = earned_score * 10.0
+        if coins_awarded > 0:
+            profile.balance += coins_awarded
+            profile.save()
 
-        messages.success(request, f'Exam submitted successfully! Score: {earned_score}/{total_possible}.')
-        _create_notification(profile, 'Exam Completed', f'Submitted {exam.title} with score {earned_score}/{total_possible}.')
+        messages.success(request, f'Exam submitted! Score: {earned_score}/{total_possible}. You earned ${coins_awarded} coins!')
+        _create_notification(profile, 'Exam Completed', f'Submitted {exam.title} with score {earned_score}/{total_possible}. Earned ${coins_awarded}.')
         return redirect('market:live_exam')
 
     return render(request, 'market/exam.html', {
@@ -741,12 +745,10 @@ def admin_exam_question_add(request, exam_id):
 def admin_reports(request):
     teams = Profile.objects.exclude(user__is_superuser=True)
     fastest_team = sorted(teams, key=lambda t: t.total_travel_time)[0] if teams.exists() else None
-    highest_power_team = sorted(teams, key=lambda t: -t.average_vehicle_power)[0] if teams.exists() else None
     most_delay_team = sorted(teams, key=lambda t: -t.total_delay)[0] if teams.exists() else None
 
     return render(request, 'market/admin/reports.html', {
         'fastest_team': fastest_team,
-        'highest_power_team': highest_power_team,
         'most_delay_team': most_delay_team,
         'teams': teams,
     })
@@ -759,7 +761,7 @@ def admin_reports_export(request, report_type):
 
     writer = csv.writer(response)
     if report_type == 'leaderboard':
-        writer.writerow(['Rank', 'Team Name', 'Current Vehicle', 'Current Island', 'Completed Vehicles', 'Avg Power %', 'Total Travel Time (min)', 'Total Delay (min)', 'Coins Balance', 'Score'])
+        writer.writerow(['Rank', 'Team Name', 'Current Vehicle', 'Current Island', 'Completed Vehicles', 'Total Travel Time (min)', 'Total Delay (min)', 'Coins Balance'])
         teams = Profile.objects.exclude(user__is_superuser=True)
         l_data = []
         for t in teams:
@@ -768,16 +770,15 @@ def admin_reports_export(request, report_type):
                 'name': t.display_name,
                 'vehicle': curr_assembly.vehicle.name if curr_assembly else "Completed All",
                 'island': t.current_island.name if t.current_island else "Start Dock",
+                'island_order': t.current_island.order if t.current_island else 0,
                 'completed': t.completed_vehicles_count,
-                'power': t.average_vehicle_power,
                 'time': t.total_travel_time,
                 'delay': t.total_delay,
                 'coins': t.coins,
-                'score': t.current_score,
             })
-        l_data.sort(key=lambda x: (-x['score'], x['delay']))
+        l_data.sort(key=lambda x: (-x['island_order'], -x['coins']))
         for idx, row in enumerate(l_data, 1):
-            writer.writerow([idx, row['name'], row['vehicle'], row['island'], row['completed'], row['power'], row['time'], row['delay'], row['coins'], row['score']])
+            writer.writerow([idx, row['name'], row['vehicle'], row['island'], row['completed'], row['time'], row['delay'], row['coins']])
     
     return response
 

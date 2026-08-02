@@ -80,14 +80,6 @@ class Profile(models.Model):
         return self.vehicle_assemblies.filter(is_completed=True).count()
 
     @property
-    def average_vehicle_power(self):
-        assemblies = self.vehicle_assemblies.all()
-        if not assemblies.exists():
-            return 0.0
-        avg = assemblies.aggregate(models.Avg('power_percentage'))['power_percentage__avg']
-        return round(avg or 0.0, 2)
-
-    @property
     def total_travel_time(self):
         total = self.travel_histories.aggregate(models.Sum('actual_travel_time_minutes'))['actual_travel_time_minutes__sum']
         return round(total or 0.0, 1)
@@ -97,12 +89,7 @@ class Profile(models.Model):
         total = self.travel_histories.aggregate(models.Sum('delay_minutes'))['delay_minutes__sum']
         return round(total or 0.0, 1)
 
-    @property
-    def current_score(self):
-        # Score = (Completed Vehicles * 100) + Avg Power - (Total Delay * 0.5) + (Exam Points)
-        exam_points = self.exam_submissions.aggregate(models.Sum('score'))['score__sum'] or 0
-        score = (self.completed_vehicles_count * 100.0) + self.average_vehicle_power - (self.total_delay * 0.5) + exam_points
-        return max(0.0, round(score, 1))
+
 
 
 def create_profile(sender, **kwargs):
