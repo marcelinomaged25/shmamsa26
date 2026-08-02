@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Vehicle Assembly Yard{% endblock title %}
+
+{% block body %}
+<section class="py-4">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+      <div>
+        <h1 class="mb-1 fw-extrabold"><i class="fas fa-tools text-primary me-2"></i>Vehicle Assembly Yard</h1>
+        <p class="text-muted mb-0">Enforced progression sequence: <strong>Submarine → Boat → Car → Airplane → Horse Carriage → Train → Bicycle</strong></p>
+      </div>
+      <div>
+        <a href="{% url 'market:team_shop' %}" class="btn btn-outline-primary fw-bold"><i class="fas fa-store me-1"></i> Buy Components</a>
+      </div>
+    </div>
+
+    {% if assembly %}
+    <div class="row gy-4">
+      <!-- Active Vehicle Status & Requirements -->
+      <div class="col-lg-8">
+        <div class="card shadow-sm p-4 mb-4 border-0 fade-in-up">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <span class="badge bg-primary fs-6 me-2">Step #{{ assembly.vehicle.progression_order }}</span>
+              <h2 class="fw-bold d-inline text-dark">{{ assembly.vehicle.name }}</h2>
+            </div>
+            <span class="badge badge-soft-warning fs-5 px-3 py-2">⚡ Power: {{ assembly.power_percentage }}%</span>
+          </div>
+
+          <p class="text-muted mb-3">{{ assembly.vehicle.description }}</p>
+
+          <div class="progress mb-4" style="height: 16px;">
+            <div class="progress-bar" role="progressbar" style="width: {{ assembly.power_percentage }}%;"></div>
+          </div>
+
+          <h5 class="fw-bold mb-3"><i class="fas fa-list-check text-primary me-2"></i>Required Component Types</h5>
+          <div class="row g-3">
+            {% for req in req_details %}
+            <div class="col-md-6">
+              <div class="p-3 border rounded-4 bg-light">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong class="text-dark fs-6">{{ req.requirement.component_type.name }}</strong>
+                  <span class="badge {% if req.is_satisfied %}bg-success{% else %}bg-secondary{% endif %} px-2 py-1">
+                    {{ req.allocated_qty }} / {{ req.requirement.quantity_required }} Required
+                  </span>
+                </div>
+                {% if req.allocated_items %}
+                  <div class="small">
+                    {% for alloc in req.allocated_items %}
+                      <div class="d-flex justify-content-between text-muted mt-1">
+                        <span>{{ alloc.quantity }}x {{ alloc.power_level.name }}</span>
+                        <span class="text-dark fw-bold">+{{ alloc.power_level.power_value }} Power each</span>
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <small class="text-muted italic">No {{ req.requirement.component_type.name }} allocated yet.</small>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Component Allocation Form -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm p-4 border-0 fade-in-up">
+          <h4 class="section-heading mb-3">Allocate Components</h4>
+          {% if inventory %}
+            <form method="post" action="{% url 'market:allocate_component' %}">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label class="form-label small text-muted text-uppercase fw-bold">Select Component</label>
+                <select name="power_level_id" class="form-select form-select-lg" required>
+                  {% for inv in inventory %}
+                    <option value="{{ inv.power_level.id }}">
+                      {{ inv.power_level.name }} (Power: {{ inv.power_level.power_value }}) — Available: {{ inv.quantity }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small text-muted text-uppercase fw-bold">Quantity</label>
+                <input type="number" name="quantity" class="form-control form-control-lg" value="1" min="1" required>
+              </div>
+
+              <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold shadow">
+                <i class="fas fa-plus-circle me-1"></i> Allocate to {{ assembly.vehicle.name }}
+              </button>
+            </form>
+          {% else %}
+            <div class="empty-state py-4">
+              <i class="fas fa-boxes-stacked" style="font-size:2.5rem;"></i>
+              <p class="mb-2 text-muted">No components available in inventory.</p>
+              <a href="{% url 'market:team_shop' %}" class="btn btn-sm btn-outline-primary fw-bold">Go to Component Shop</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="card shadow-lg p-5 text-center border-0 rounded-4 fade-in-up">
+      <i class="fas fa-trophy text-warning mb-3" style="font-size: 4rem;"></i>
+      <h2 class="fw-extrabold text-primary">All Vehicles Assembled!</h2>
+      <p class="lead text-muted">Your team has completed assembly of all 7 vehicles in the competition sequence!</p>
+      <div>
+        <a href="{% url 'market:team_dashboard' %}" class="btn btn-primary btn-lg fw-bold"><i class="fas fa-tachometer-alt me-1"></i> Return to Dashboard</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock body %}

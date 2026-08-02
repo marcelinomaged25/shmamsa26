@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}{% if vehicle %}Edit Vehicle{% else %}Create Vehicle{% endif %}{% endblock title %}
+{% block body %}
+<section class="py-4">
+  <div class="container">
+    <div class="card shadow p-4 border-0 rounded-4 col-lg-7 mx-auto">
+      <h3 class="fw-bold mb-4">{% if vehicle %}Edit Vehicle: {{ vehicle.name }}{% else %}Create New Vehicle{% endif %}</h3>
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label fw-bold">Vehicle Name</label>
+          <input type="text" name="name" class="form-control" value="{{ vehicle.name|default:'' }}" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Progression Order #</label>
+          <input type="number" name="progression_order" class="form-control" value="{{ vehicle.progression_order|default:1 }}" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Description</label>
+          <textarea name="description" class="form-control" rows="3">{{ vehicle.description|default:'' }}</textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Base Travel Time (minutes)</label>
+          <input type="number" name="base_travel_time_minutes" class="form-control" value="{{ vehicle.base_travel_time_minutes|default:120 }}" required>
+        </div>
+
+        <h5 class="fw-bold mt-4 mb-3">Component Requirements</h5>
+        <div id="requirementsContainer">
+          {% if vehicle %}
+            {% for req in vehicle.requirements.all %}
+            <div class="row g-2 mb-2 requirement-row">
+              <div class="col-7">
+                <select name="req_type_id" class="form-select">
+                  {% for t in types %}
+                  <option value="{{ t.id }}" {% if t.id == req.component_type_id %}selected{% endif %}>{{ t.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-3">
+                <input type="number" name="req_quantity" class="form-control" value="{{ req.quantity_required }}" placeholder="Qty" min="1">
+              </div>
+              <div class="col-2">
+                <button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="this.closest('.requirement-row').remove()"><i class="fas fa-times"></i></button>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="row g-2 mb-2 requirement-row">
+              <div class="col-7">
+                <select name="req_type_id" class="form-select">
+                  {% for t in types %}
+                  <option value="{{ t.id }}">{{ t.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-3">
+                <input type="number" name="req_quantity" class="form-control" placeholder="Qty" min="1" value="1">
+              </div>
+              <div class="col-2">
+                <button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="this.closest('.requirement-row').remove()"><i class="fas fa-times"></i></button>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <button type="button" class="btn btn-outline-primary btn-sm mb-4" id="addReqBtn">
+          <i class="fas fa-plus me-1"></i> Add Requirement Row
+        </button>
+
+        <button type="submit" class="btn btn-success w-100 fw-bold py-2">Save Vehicle</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock body %}
+
+{% block extra_js %}
+<script>
+  document.getElementById('addReqBtn').addEventListener('click', function() {
+    const container = document.getElementById('requirementsContainer');
+    const firstRow = container.querySelector('.requirement-row');
+    if (firstRow) {
+      const clone = firstRow.cloneNode(true);
+      clone.querySelector('input[name="req_quantity"]').value = '1';
+      container.appendChild(clone);
+    }
+  });
+</script>
+{% endblock extra_js %}

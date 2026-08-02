@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Blog{% endblock title %}
+
+{% block body %}
+<section class="py-4">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+      <div>
+        <h1 class="mb-1">Conference Blog</h1>
+        <p class="text-muted mb-0">Read announcements, tips, and updates shared by admins. React to content with your team.</p>
+      </div>
+      {% if user.is_authenticated %}
+      <a class="btn btn-outline-primary" href="{% url 'market:team_dashboard' %}">Back to Dashboard</a>
+      {% endif %}
+    </div>
+
+    {% for post in posts %}
+    <div class="card shadow-sm mb-4 border-0 card-hover fade-in-up">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+          <div>
+            <h3 class="mb-1">{{ post.title }}</h3>
+            <p class="text-muted small mb-0"><i class="far fa-calendar me-1"></i>Published on {{ post.published_at|date:'M d, Y' }}</p>
+          </div>
+          <div class="text-end">
+            <span class="badge badge-soft-success me-1">👍 {{ post.like_count }}</span>
+            <span class="badge badge-soft-danger me-1">❤️ {{ post.love_count }}</span>
+            <span class="badge badge-soft-warning">👏 {{ post.clap_count }}</span>
+          </div>
+        </div>
+        <div class="mb-4 text-body">
+          <p>{{ post.content|linebreaks }}</p>
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="d-flex gap-2">
+          <form method="post" action="{% url 'market:blog_react' post.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="reaction_type" value="like" />
+            <button type="submit" class="btn btn-outline-success btn-sm">👍 Like</button>
+          </form>
+          <form method="post" action="{% url 'market:blog_react' post.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="reaction_type" value="love" />
+            <button type="submit" class="btn btn-outline-danger btn-sm">❤️ Love</button>
+          </form>
+          <form method="post" action="{% url 'market:blog_react' post.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="reaction_type" value="clap" />
+            <button type="submit" class="btn btn-outline-warning btn-sm">👏 Clap</button>
+          </form>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">Please <a href="{% url 'login' %}">login</a> to react.</p>
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <div class="card shadow-sm p-4 border-0">
+      <div class="empty-state">
+        <i class="fas fa-newspaper"></i>
+        <p class="mb-0">No blog posts have been published yet.</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock body %}

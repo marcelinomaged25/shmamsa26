@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Add Question{% endblock title %}
+{% block body %}
+<section class="py-4">
+  <div class="container">
+    <div class="card shadow p-4 border-0 rounded-4 col-lg-7 mx-auto">
+      <h3 class="fw-bold mb-2">Add Question to Question Bank</h3>
+      <p class="text-muted mb-4">Exam: <strong>{{ exam.title }}</strong></p>
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label font-weight-bold">Question Type</label>
+          <select name="question_type" class="form-select" id="qtypeSelect" required>
+            <option value="mcq">Multiple Choice</option>
+            <option value="tf">True / False</option>
+            <option value="short">Short Answer</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label font-weight-bold">Question Text</label>
+          <textarea name="question_text" class="form-control" rows="3" required></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label font-weight-bold">Points Awarded</label>
+          <input type="number" name="points" class="form-control" value="50" required>
+        </div>
+
+        <div id="mcqBlock">
+          <h5 class="fw-bold mt-4 mb-2">Choices (Select the radio button for the correct choice)</h5>
+          <div class="input-group mb-2">
+            <div class="input-group-text"><input type="radio" name="correct_choice" value="0" checked></div>
+            <input type="text" name="choice_text" class="form-control" placeholder="Choice 1">
+          </div>
+          <div class="input-group mb-2">
+            <div class="input-group-text"><input type="radio" name="correct_choice" value="1"></div>
+            <input type="text" name="choice_text" class="form-control" placeholder="Choice 2">
+          </div>
+          <div class="input-group mb-2">
+            <div class="input-group-text"><input type="radio" name="correct_choice" value="2"></div>
+            <input type="text" name="choice_text" class="form-control" placeholder="Choice 3">
+          </div>
+        </div>
+
+        <div id="tfBlock" style="display:none;">
+          <h5 class="fw-bold mt-4 mb-2">Choices (Select the correct option)</h5>
+          <div class="input-group mb-2">
+            <div class="input-group-text"><input type="radio" name="correct_choice" value="0" checked></div>
+            <input type="text" name="choice_text" class="form-control" value="True" readonly>
+          </div>
+          <div class="input-group mb-2">
+            <div class="input-group-text"><input type="radio" name="correct_choice" value="1"></div>
+            <input type="text" name="choice_text" class="form-control" value="False" readonly>
+          </div>
+        </div>
+
+        <div id="shortBlock" style="display:none;">
+          <div class="mb-3">
+            <label class="form-label font-weight-bold">Exact Correct Short Answer</label>
+            <input type="text" name="short_answer_correct" class="form-control">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100 fw-bold py-2 mt-3">Add Question</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock body %}
+
+{% block extra_js %}
+<script>
+  const qtypeSelect = document.getElementById('qtypeSelect');
+  const mcqBlock = document.getElementById('mcqBlock');
+  const tfBlock = document.getElementById('tfBlock');
+  const shortBlock = document.getElementById('shortBlock');
+
+  function toggleBlocks() {
+    const val = qtypeSelect.value;
+    
+    // Disable inputs in non-active blocks so they are not submitted
+    disableInputs(mcqBlock);
+    disableInputs(tfBlock);
+    disableInputs(shortBlock);
+    
+    mcqBlock.style.display = 'none';
+    tfBlock.style.display = 'none';
+    shortBlock.style.display = 'none';
+
+    if (val === 'mcq') {
+      mcqBlock.style.display = 'block';
+      enableInputs(mcqBlock);
+    } else if (val === 'tf') {
+      tfBlock.style.display = 'block';
+      enableInputs(tfBlock);
+    } else if (val === 'short') {
+      shortBlock.style.display = 'block';
+      enableInputs(shortBlock);
+    }
+  }
+
+  function disableInputs(block) {
+    block.querySelectorAll('input').forEach(input => {
+      input.disabled = true;
+    });
+  }
+
+  function enableInputs(block) {
+    block.querySelectorAll('input').forEach(input => {
+      input.disabled = false;
+    });
+  }
+
+  qtypeSelect.addEventListener('change', toggleBlocks);
+  toggleBlocks(); // Initial trigger
+</script>
+{% endblock extra_js %}

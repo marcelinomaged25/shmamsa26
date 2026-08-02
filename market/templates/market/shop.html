@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Component Shop{% endblock title %}
+
+{% block body %}
+<section class="py-4">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+      <div>
+        <h1 class="mb-1 fw-extrabold"><i class="fas fa-store text-primary me-2"></i>Component Shop</h1>
+        <p class="text-muted mb-0">Purchase vehicle components with power ratings (25, 50, 100) using team coins.</p>
+      </div>
+      <div>
+        <span class="badge bg-dark fs-5 px-3 py-2 text-warning"><i class="fas fa-coins me-1"></i> Balance: ${{ profile.coins }} Coins</span>
+      </div>
+    </div>
+
+    <div class="row gy-4">
+      <!-- Components Catalog -->
+      <div class="col-lg-8">
+        <div class="card shadow-sm p-4 border-0 fade-in-up">
+          <h4 class="section-heading mb-4">Available Power Components</h4>
+          <div class="row g-3">
+            {% for comp in components %}
+            <div class="col-md-6">
+              <div class="card border rounded-4 p-3 card-hover h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="fw-bold mb-0 text-primary">{{ comp.name }}</h5>
+                    <span class="badge {% if comp.power_value == 100 %}bg-danger{% elif comp.power_value == 50 %}bg-warning text-dark{% else %}bg-secondary{% endif %} fs-7">
+                      ⚡ {{ comp.power_value }} Power
+                    </span>
+                  </div>
+                  <p class="text-muted small mb-2">{{ comp.description|default:"High efficiency vehicle component." }}</p>
+                  <div class="d-flex gap-2 mb-3">
+                    <span class="badge badge-soft-success fs-6">${{ comp.price }} Coins</span>
+                    <span class="badge badge-soft-info">{{ comp.stock }} in stock</span>
+                  </div>
+                </div>
+
+                <form method="post" action="{% url 'market:buy_component' comp.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-primary w-100 fw-bold" {% if profile.balance < comp.price or comp.stock <= 0 %}disabled{% endif %}>
+                    <i class="fas fa-shopping-bag me-1"></i> Purchase Component
+                  </button>
+                </form>
+              </div>
+            </div>
+            {% empty %}
+            <div class="empty-state py-5">
+              <i class="fas fa-box-open" style="font-size:3rem;"></i>
+              <p class="mb-0 mt-2">No components available in stock.</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Inventory Sidebar -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm p-4 border-0 fade-in-up">
+          <h4 class="section-heading mb-3">Unallocated Inventory</h4>
+          {% if inventory %}
+            <ul class="list-group list-group-flush mb-3">
+              {% for inv in inventory %}
+              <li class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
+                <div>
+                  <strong class="d-block text-dark">{{ inv.power_level.name }}</strong>
+                  <span class="badge badge-soft-primary small">Power: {{ inv.power_level.power_value }}</span>
+                </div>
+                <span class="badge bg-dark fs-6 px-3 py-2">x{{ inv.quantity }}</span>
+              </li>
+              {% endfor %}
+            </ul>
+            <a href="{% url 'market:vehicle_assembly' %}" class="btn btn-warning w-100 fw-bold">
+              <i class="fas fa-tools me-1"></i> Allocate to Vehicle Assembly
+            </a>
+          {% else %}
+            <div class="empty-state py-4">
+              <i class="fas fa-boxes-stacked" style="font-size:2.5rem;"></i>
+              <p class="mb-0 mt-2 text-muted">Your team inventory is empty.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock body %}

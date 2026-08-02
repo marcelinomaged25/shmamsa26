@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Manage Vehicles{% endblock title %}
+{% block body %}
+<section class="py-4">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="fw-extrabold"><i class="fas fa-car text-warning me-2"></i>Vehicles Progression Order</h1>
+      <a href="{% url 'market:admin_vehicle_create' %}" class="btn btn-primary fw-bold"><i class="fas fa-plus me-1"></i> Create Vehicle</a>
+    </div>
+    <div class="row g-4">
+      {% for v in vehicles %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm p-4 border-0 rounded-4 h-100">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-primary fs-6">Order #{{ v.progression_order }}</span>
+            <span class="badge badge-soft-info">Base Time: {{ v.base_travel_time_minutes }} min</span>
+          </div>
+          <h4 class="fw-bold mb-2">{{ v.name }}</h4>
+          <p class="text-muted small mb-3">{{ v.description }}</p>
+          <h6 class="fw-bold text-uppercase small text-muted">Required Component Types:</h6>
+          <ul class="list-unstyled mb-3 small">
+            {% for req in v.requirements.all %}
+            <li><i class="fas fa-check text-success me-1"></i> {{ req.quantity_required }}x {{ req.component_type.name }}</li>
+            {% empty %}
+            <li class="text-muted">No requirements configured.</li>
+            {% endfor %}
+          </ul>
+          <div class="d-flex gap-2 mt-auto">
+            <a href="{% url 'market:admin_vehicle_edit' v.id %}" class="btn btn-sm btn-outline-primary flex-fill"><i class="fas fa-edit me-1"></i> Edit</a>
+            <form method="post" action="{% url 'market:admin_vehicle_delete' v.id %}" class="d-inline" onsubmit="return confirm('Delete vehicle {{ v.name }}?')">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center text-muted py-5">No vehicles configured yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock body %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Competition Reports{% endblock title %}
+{% block body %}
+<section class="py-4">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="fw-extrabold"><i class="fas fa-chart-bar text-warning me-2"></i>Competition Analytics & Reports</h1>
+      <a href="{% url 'market:admin_reports_export' 'leaderboard' %}" class="btn btn-success fw-bold"><i class="fas fa-file-csv me-1"></i> Export Leaderboard CSV</a>
+    </div>
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <div class="card p-4 shadow-sm border-0 rounded-4 bg-primary text-white">
+          <span class="text-uppercase small fw-bold opacity-75">? Highest Average Power</span>
+          <h3 class="fw-extrabold mt-2 mb-0">{{ highest_power_team.display_name|default:"N/A" }}</h3>
+          <p class="mb-0 fs-5 mt-1">{{ highest_power_team.average_vehicle_power }}% Power</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-4 shadow-sm border-0 rounded-4 bg-success text-white">
+          <span class="text-uppercase small fw-bold opacity-75">? Fastest Overall Travel</span>
+          <h3 class="fw-extrabold mt-2 mb-0">{{ fastest_team.display_name|default:"N/A" }}</h3>
+          <p class="mb-0 fs-5 mt-1">{{ fastest_team.total_travel_time }} Minutes</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-4 shadow-sm border-0 rounded-4 bg-danger text-white">
+          <span class="text-uppercase small fw-bold opacity-75">? Most Accumulated Delay</span>
+          <h3 class="fw-extrabold mt-2 mb-0">{{ most_delay_team.display_name|default:"N/A" }}</h3>
+          <p class="mb-0 fs-5 mt-1">+{{ most_delay_team.total_delay }} Min Delay</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock body %}

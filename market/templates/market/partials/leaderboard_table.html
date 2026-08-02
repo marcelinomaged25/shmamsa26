@@ -1,0 +1,71 @@
+<table class="table table-hover align-middle mb-0">
+  <thead class="table-dark text-uppercase small">
+    <tr>
+      <th scope="col">Rank</th>
+      <th scope="col">Team</th>
+      <th scope="col">Vehicle Progress</th>
+      <th scope="col">Current Island</th>
+      <th scope="col">Avg Power</th>
+      <th scope="col">Travel Time</th>
+      <th scope="col">Delay</th>
+      <th scope="col">Coins</th>
+      <th scope="col" class="text-end">Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for team in leaderboard %}
+    <tr class="{% if team.rank == 1 %}table-warning fw-bold{% elif team.rank == 2 %}table-light{% elif team.rank == 3 %}table-light{% endif %}">
+      <td>
+        {% if team.rank == 1 %}
+          <span class="badge bg-warning text-dark fs-6">?? #1</span>
+        {% elif team.rank == 2 %}
+          <span class="badge bg-secondary fs-6">?? #2</span>
+        {% elif team.rank == 3 %}
+          <span class="badge bg-danger fs-6">?? #3</span>
+        {% else %}
+          <span class="fw-bold text-muted">#{{ team.rank }}</span>
+        {% endif %}
+      </td>
+      <td>
+        <strong class="fs-6 d-block">{{ team.team_name }}</strong>
+        <small class="text-muted">{{ team.profile.user.username }}</small>
+      </td>
+      <td>
+        <span class="badge badge-soft-primary fs-7 mb-1">{{ team.current_vehicle }}</span>
+        <div class="progress" style="height: 6px; width: 100px;">
+          <div class="progress-bar" style="width: {{ team.completed_vehicles }}0%;"></div>
+        </div>
+        <small class="text-muted" style="font-size: 0.75rem;">{{ team.completed_vehicles }}/7 Completed</small>
+      </td>
+      <td>
+        <span class="badge badge-soft-info"><i class="fas fa-umbrella-beach me-1"></i>{{ team.current_island }}</span>
+      </td>
+      <td>
+        <span class="fw-bold {% if team.avg_power >= 80 %}text-success{% elif team.avg_power >= 50 %}text-warning{% else %}text-danger{% endif %}">
+          {{ team.avg_power }}%
+        </span>
+      </td>
+      <td>
+        <span><i class="far fa-clock me-1 text-muted"></i>{{ team.total_time }} min</span>
+      </td>
+      <td>
+        {% if team.total_delay > 0 %}
+          <span class="text-danger fw-bold">+{{ team.total_delay }} min</span>
+        {% else %}
+          <span class="text-success fw-bold">0 min</span>
+        {% endif %}
+      </td>
+      <td>
+        <span class="badge badge-soft-success">${{ team.coins }}</span>
+      </td>
+      <td class="text-end">
+        <span class="fs-5 fw-bold text-primary">{{ team.score }}</span>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="9" class="text-center py-4 text-muted">No competing teams registered yet.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

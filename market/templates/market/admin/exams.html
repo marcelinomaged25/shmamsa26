@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Manage Exams{% endblock title %}
+{% block body %}
+<section class="py-4">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="fw-extrabold"><i class="fas fa-graduation-cap text-success me-2"></i>Live Exams</h1>
+      <a href="{% url 'market:admin_exam_create' %}" class="btn btn-primary fw-bold"><i class="fas fa-plus me-1"></i> Create Exam</a>
+    </div>
+
+    <div class="card shadow border-0 rounded-4 overflow-hidden">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>Title</th>
+            <th>Duration</th>
+            <th>Questions</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for exam in exams %}
+          <tr>
+            <td>
+              <strong class="d-block">{{ exam.title }}</strong>
+              <small class="text-muted">{{ exam.description|truncatechars:50 }}</small>
+            </td>
+            <td><i class="far fa-clock text-muted me-1"></i>{{ exam.duration_seconds }}s</td>
+            <td><span class="badge badge-soft-primary">{{ exam.questions.count }}</span></td>
+            <td>
+              {% if exam.is_published %}
+              <span class="badge bg-success"><i class="fas fa-eye me-1"></i> Published (Live)</span>
+              {% else %}
+              <span class="badge bg-secondary"><i class="fas fa-eye-slash me-1"></i> Draft (Hidden)</span>
+              {% endif %}
+            </td>
+            <td class="text-end">
+              <div class="d-flex justify-content-end gap-1">
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-toggle="collapse" data-target="#questionsExam{{ exam.id }}" title="View Questions">
+                  <i class="fas fa-list"></i>
+                </button>
+                <a href="{% url 'market:admin_exam_question_add' exam.id %}" class="btn btn-sm btn-outline-info" title="Add Question"><i class="fas fa-plus-circle"></i></a>
+                
+                <form method="post" action="{% url 'market:admin_exam_toggle' exam.id %}" class="d-inline">
+                  {% csrf_token %}
+                  {% if exam.is_published %}
+                  <input type="hidden" name="action" value="unpublish">
+                  <button type="submit" class="btn btn-sm btn-outline-warning" title="Unpublish"><i class="fas fa-eye-slash"></i></button>
+                  {% else %}
+                  <input type="hidden" name="action" value="publish">
+                  <button type="submit" class="btn btn-sm btn-outline-success" title="Publish"><i class="fas fa-eye"></i></button>
+                  {% endif %}
+                </form>
+
+                <form method="post" action="{% url 'market:admin_exam_toggle' exam.id %}" class="d-inline" onsubmit="return confirm('Delete exam {{ exam.title }}?')">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="delete">
+                  <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <tr class="collapse" id="questionsExam{{ exam.id }}">
+            <td colspan="5" class="bg-light">
+              <div class="p-3">
+                <h6 class="fw-bold mb-3 text-secondary">Questions in this Exam:</h6>
+                {% for q in exam.questions.all %}
+                  <div class="card p-3 mb-2 border-0 shadow-sm rounded-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div>
+                        <strong>Q{{ forloop.counter }}: {{ q.question_text }}</strong>
+                        <span class="badge bg-secondary ms-2">
+                          {% if q.question_type == 'mcq' %}Multiple Choice
+                          {% elif q.question_type == 'tf' %}True / False
+                          {% else %}Short Answer{% endif %}
+                        </span>
+                        <span class="badge bg-info ms-1">{{ q.points }} pts</span>
+                      </div>
+                    </div>
+                    {% if q.question_type == 'mcq' or q.question_type == 'tf' %}
+                      <ul class="list-group list-group-flush mt-2">
+                        {% for choice in q.choices.all %}
+                          <li class="list-group-item bg-transparent py-1 border-0">
+                            {% if choice.is_correct %}
+                              <span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i> {{ choice.choice_text }} (Correct)</span>
+                            {% else %}
+                              <span class="text-muted"><i class="far fa-circle me-1"></i> {{ choice.choice_text }}</span>
+                            {% endif %}
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% elif q.question_type == 'short' %}
+                      <div class="mt-2 text-success">
+                        <strong>Correct Answer:</strong> <code>{{ q.short_answer_correct }}</code>
+                      </div>
+                    {% endif %}
+                  </div>
+                {% empty %}
+                  <div class="text-muted small">No questions added yet.</div>
+                {% endfor %}
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="text-center text-muted py-4">No exams created yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock body %}
