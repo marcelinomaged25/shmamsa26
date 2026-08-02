@@ -134,12 +134,12 @@
 
           <form method="post" action="{% url 'market:travel_island' %}">
             {% csrf_token %}
-            <button type="submit" class="btn btn-success btn-lg w-100 fw-bold py-3 shadow" {% if not current_assembly or not current_assembly.is_completed %}disabled{% endif %}>
+            <button type="submit" class="btn btn-success btn-lg w-100 fw-bold py-3 shadow" {% if not can_travel %}disabled{% endif %}>
               <i class="fas fa-paper-plane me-2"></i> Travel To Next Island
             </button>
           </form>
-          {% if current_assembly and not current_assembly.is_completed %}
-            <small class="text-muted text-center d-block mt-2"><i class="fas fa-lock me-1"></i> Complete {{ current_assembly.vehicle.name }} assembly to unlock island travel.</small>
+          {% if not can_travel %}
+            <small class="text-muted text-center d-block mt-2"><i class="fas fa-lock me-1"></i> Complete your next vehicle assembly to unlock island travel.</small>
           {% endif %}
         </div>
       </div>

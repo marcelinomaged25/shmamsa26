@@ -127,6 +127,7 @@ def team_dashboard(request):
     history = profile.travel_histories.select_related('from_island', 'to_island', 'vehicle')[:5]
     notifications = profile.notifications.filter(is_read=False)[:5]
     comp_state = _get_competition_state()
+    can_travel = profile.completed_vehicles_count > profile.travel_histories.count()
 
     return render(request, 'market/dashboard.html', {
         'profile': profile,
@@ -135,6 +136,7 @@ def team_dashboard(request):
         'travel_history': history,
         'notifications': notifications,
         'comp_state': comp_state,
+        'can_travel': can_travel,
     })
 
 
@@ -386,14 +388,14 @@ def travel_island(request):
         return redirect('market:team_dashboard')
 
     profile = get_object_or_404(Profile, user=request.user)
-    curr_assembly = profile.current_vehicle_assembly
     
-    # Must have a completed vehicle to travel
-    prev_assembly = TeamVehicleAssembly.objects.filter(profile=profile, is_completed=True).order_by('-vehicle__progression_order').first()
-    
-    if not prev_assembly:
-        messages.error(request, 'Your team must complete your current vehicle before travelling between islands!')
+    can_travel = profile.completed_vehicles_count > profile.travel_histories.count()
+    if not can_travel:
+        messages.error(request, 'Your team must complete your current vehicle assembly before travelling to the next island!')
         return redirect('market:vehicle_assembly')
+
+    # Get the latest completed assembly for travel stats
+    prev_assembly = TeamVehicleAssembly.objects.filter(profile=profile, is_completed=True).order_by('-vehicle__progression_order').first()
 
     # Get current island or start at Island #1
     current_island = profile.current_island
