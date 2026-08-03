@@ -1,32 +1,32 @@
 {% extends 'base.html' %}
-{% block title %}Add Question{% endblock title %}
+{% block title %}إضافة سؤال{% endblock title %}
 {% block body %}
 <section class="py-4">
   <div class="container">
     <div class="card shadow p-4 border-0 rounded-4 col-lg-7 mx-auto">
-      <h3 class="fw-bold mb-2">Add Question to Question Bank</h3>
-      <p class="text-muted mb-4">Exam: <strong>{{ exam.title }}</strong></p>
+      <h3 class="fw-bold mb-2">إضافة سؤال للاختبار</h3>
+      <p class="text-muted mb-4">الاختبار: <strong>{{ exam.title }}</strong></p>
       <form method="post">
         {% csrf_token %}
         <div class="mb-3">
-          <label class="form-label font-weight-bold">Question Type</label>
+          <label class="form-label font-weight-bold">نوع السؤال</label>
           <select name="question_type" class="form-select" id="qtypeSelect" required>
-            <option value="mcq">Multiple Choice</option>
-            <option value="tf">True / False</option>
-            <option value="short">Short Answer</option>
+            <option value="mcq">اختيار من متعدد</option>
+            <option value="tf">صح أو خطأ</option>
+            <option value="short">إجابة قصيرة</option>
           </select>
         </div>
         <div class="mb-3">
-          <label class="form-label font-weight-bold">Question Text</label>
+          <label class="form-label font-weight-bold">نص السؤال</label>
           <textarea name="question_text" class="form-control" rows="3" required></textarea>
         </div>
         <div class="mb-3">
-          <label class="form-label font-weight-bold">Points Awarded</label>
+          <label class="form-label font-weight-bold">النقاط</label>
           <input type="number" name="points" class="form-control" value="50" required>
         </div>
 
         <div id="mcqBlock">
-          <h5 class="fw-bold mt-4 mb-2">Choices (Select the radio button for the correct choice)</h5>
+          <h5 class="fw-bold mt-4 mb-2">الاختيارات (حدد الدائرة بجوار الإجابة الصحيحة)</h5>
           <div class="input-group mb-2">
             <div class="input-group-text"><input type="radio" name="correct_choice" value="0" checked></div>
             <input type="text" name="choice_text" class="form-control" placeholder="Choice 1">
@@ -42,7 +42,7 @@
         </div>
 
         <div id="tfBlock" style="display:none;">
-          <h5 class="fw-bold mt-4 mb-2">Choices (Select the correct option)</h5>
+          <h5 class="fw-bold mt-4 mb-2">الاختيارات (حدد الإجابة الصحيحة)</h5>
           <div class="input-group mb-2">
             <div class="input-group-text"><input type="radio" name="correct_choice" value="0" checked></div>
             <input type="text" name="choice_text" class="form-control" value="True" readonly>
@@ -55,12 +55,12 @@
 
         <div id="shortBlock" style="display:none;">
           <div class="mb-3">
-            <label class="form-label font-weight-bold">Exact Correct Short Answer</label>
+            <label class="form-label font-weight-bold">الإجابة القصيرة الصحيحة</label>
             <input type="text" name="short_answer_correct" class="form-control">
           </div>
         </div>
 
-        <button type="submit" class="btn btn-success w-100 fw-bold py-2 mt-3">Add Question</button>
+        <button type="submit" class="btn btn-success w-100 fw-bold py-2 mt-3">إضافة السؤال</button>
       </form>
     </div>
   </div>

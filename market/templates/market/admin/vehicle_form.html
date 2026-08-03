@@ -1,30 +1,30 @@
 {% extends 'base.html' %}
-{% block title %}{% if vehicle %}Edit Vehicle{% else %}Create Vehicle{% endif %}{% endblock title %}
+{% block title %}{% if vehicle %}تعديل مركبة{% else %}إضافة مركبة{% endif %}{% endblock title %}
 {% block body %}
 <section class="py-4">
   <div class="container">
     <div class="card shadow p-4 border-0 rounded-4 col-lg-7 mx-auto">
-      <h3 class="fw-bold mb-4">{% if vehicle %}Edit Vehicle: {{ vehicle.name }}{% else %}Create New Vehicle{% endif %}</h3>
+      <h3 class="fw-bold mb-4">{% if vehicle %}تعديل المركبة: {{ vehicle.name }}{% else %}إضافة مركبة جديدة{% endif %}</h3>
       <form method="post">
         {% csrf_token %}
         <div class="mb-3">
-          <label class="form-label fw-bold">Vehicle Name</label>
+          <label class="form-label fw-bold">اسم المركبة</label>
           <input type="text" name="name" class="form-control" value="{{ vehicle.name|default:'' }}" required>
         </div>
         <div class="mb-3">
-          <label class="form-label fw-bold">Progression Order #</label>
+          <label class="form-label fw-bold">ترتيب المركبة</label>
           <input type="number" name="progression_order" class="form-control" value="{{ vehicle.progression_order|default:1 }}" required>
         </div>
         <div class="mb-3">
-          <label class="form-label fw-bold">Description</label>
+          <label class="form-label fw-bold">الوصف</label>
           <textarea name="description" class="form-control" rows="3">{{ vehicle.description|default:'' }}</textarea>
         </div>
         <div class="mb-3">
-          <label class="form-label fw-bold">Base Travel Time (minutes)</label>
+          <label class="form-label fw-bold">وقت الرحلة الأساسي (دقيقة)</label>
           <input type="number" name="base_travel_time_minutes" class="form-control" value="{{ vehicle.base_travel_time_minutes|default:120 }}" required>
         </div>
 
-        <h5 class="fw-bold mt-4 mb-3">Component Requirements</h5>
+        <h5 class="fw-bold mt-4 mb-3">المكونات المطلوبة</h5>
         <div id="requirementsContainer">
           {% if vehicle %}
             {% for req in vehicle.requirements.all %}
@@ -64,10 +64,10 @@
         </div>
 
         <button type="button" class="btn btn-outline-primary btn-sm mb-4" id="addReqBtn">
-          <i class="fas fa-plus me-1"></i> Add Requirement Row
+          <i class="fas fa-plus me-1"></i> إضافة مكوّن مطلوب
         </button>
 
-        <button type="submit" class="btn btn-success w-100 fw-bold py-2">Save Vehicle</button>
+        <button type="submit" class="btn btn-success w-100 fw-bold py-2">حفظ المركبة</button>
       </form>
     </div>
   </div>

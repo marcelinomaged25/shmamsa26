@@ -191,7 +191,7 @@ def buy_component(request, power_level_id):
     curr_assembly = profile.current_vehicle_assembly
 
     if not curr_assembly:
-        messages.error(request, 'You have completed all vehicles and cannot purchase more components.')
+        messages.error(request, 'أكمل فريقك جميع المركبات، ولا يمكنك شراء مكونات إضافية.')
         return redirect('market:team_shop')
 
     req = VehicleComponentRequirement.objects.filter(
@@ -213,11 +213,11 @@ def buy_component(request, power_level_id):
         return redirect('market:team_shop')
 
     if comp.stock <= 0:
-        messages.error(request, 'This component is currently out of stock.')
+        messages.error(request, 'هذا المكوّن غير متوفر حاليًا.')
         return redirect('market:team_shop')
 
     if profile.balance < comp.price:
-        messages.error(request, f'Insufficient coins balance! Need ${comp.price}, but you have ${profile.balance}.')
+        messages.error(request, f'رصيد العملات غير كافٍ. المطلوب ${comp.price} والمتاح ${profile.balance}.')
         return redirect('market:team_shop')
 
     # Deduct coins and update stock
@@ -231,7 +231,7 @@ def buy_component(request, power_level_id):
     inv_item.quantity += 1
     inv_item.save()
 
-    messages.success(request, f'Successfully purchased 1x {comp.name} for ${comp.price} coins!')
+    messages.success(request, f'تم شراء قطعة واحدة من {comp.name} مقابل ${comp.price}.')
     _create_notification(profile, 'Component Purchased', f'Purchased 1x {comp.name} for ${comp.price}.')
     return redirect('market:team_shop')
 
@@ -297,7 +297,7 @@ def vehicle_assembly(request):
     curr_assembly = profile.current_vehicle_assembly
     
     if not curr_assembly:
-        messages.info(request, 'Congratulations! Your team has assembled all 7 vehicles in the competition!')
+        messages.info(request, 'تهانينا! أكمل فريقك جميع مركبات المسابقة السبع.')
         return redirect('market:team_dashboard')
 
     requirements = curr_assembly.vehicle.requirements.select_related('component_type').all()
@@ -333,7 +333,7 @@ def allocate_component(request):
     curr_assembly = profile.current_vehicle_assembly
     
     if not curr_assembly:
-        messages.error(request, 'No active vehicle assembly available.')
+        messages.error(request, 'لا توجد مركبة نشطة للتجميع.')
         return redirect('market:team_dashboard')
 
     power_level_id = request.POST.get('power_level_id')
@@ -346,7 +346,7 @@ def allocate_component(request):
     inv_item = InventoryItem.objects.filter(profile=profile, power_level=power_level).first()
 
     if not inv_item or inv_item.quantity < quantity:
-        messages.error(request, 'You do not have enough of this component in your inventory.')
+        messages.error(request, 'لا تملك كمية كافية من هذا المكوّن في المخزون.')
         return redirect('market:vehicle_assembly')
 
     # Enforce vehicle component type requirement
@@ -389,7 +389,7 @@ def travel_island(request):
     
     can_travel = profile.completed_vehicles_count > profile.travel_histories.count()
     if not can_travel:
-        messages.error(request, 'Your team must complete your current vehicle assembly before travelling to the next island!')
+        messages.error(request, 'يجب إكمال تجميع المركبة الحالية قبل الانتقال إلى الجزيرة التالية.')
         return redirect('market:vehicle_assembly')
 
     # Get the latest completed assembly for travel stats
@@ -407,7 +407,7 @@ def travel_island(request):
     # Next island in sequence
     next_island = Island.objects.filter(order=current_island.order + 1).first()
     if not next_island:
-        messages.info(request, 'Your team has already reached the final island!')
+        messages.info(request, 'لقد وصل فريقك بالفعل إلى الجزيرة الأخيرة.')
         return redirect('market:team_dashboard')
 
     # Calculate Travel Time & Delay
@@ -496,7 +496,7 @@ def live_exam(request):
         if session_key in request.session:
             del request.session[session_key]
 
-        messages.success(request, f'Exam submitted! Score: {earned_score}/{total_possible}. You earned ${coins_awarded} coins!')
+        messages.success(request, f'تم تسليم الاختبار. النتيجة: {earned_score}/{total_possible}، وربحت ${coins_awarded} عملة.')
         _create_notification(profile, 'Exam Completed', f'Submitted {exam.title} with score {earned_score}/{total_possible}. Earned ${coins_awarded}.')
         return redirect('market:live_exam')
 
@@ -560,17 +560,17 @@ def admin_competition_toggle(request):
         if action == 'start':
             state.status = 'active'
             state.started_at = timezone.now()
-            messages.success(request, '🏁 Competition officially STARTED!')
+            messages.success(request, 'بدأت المسابقة رسميًا!')
         elif action == 'pause':
             state.status = 'paused'
-            messages.warning(request, '⏸ Competition PAUSED.')
+            messages.warning(request, 'تم إيقاف المسابقة مؤقتًا.')
         elif action == 'resume':
             state.status = 'active'
-            messages.success(request, '▶ Competition RESUMED.')
+            messages.success(request, 'تم استئناف المسابقة.')
         elif action == 'finish':
             state.status = 'finished'
             state.finished_at = timezone.now()
-            messages.info(request, '🏆 Competition FINISHED!')
+            messages.info(request, 'انتهت المسابقة!')
         state.save()
     return redirect('market:admin_dashboard')
 

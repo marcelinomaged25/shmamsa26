@@ -1,22 +1,22 @@
 {% extends 'base.html' %}
-{% block title %}Manage Exams{% endblock title %}
+{% block title %}إدارة الاختبارات{% endblock title %}
 {% block body %}
 <section class="py-4">
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1 class="fw-extrabold"><i class="fas fa-graduation-cap text-success me-2"></i>Live Exams</h1>
-      <a href="{% url 'market:admin_exam_create' %}" class="btn btn-primary fw-bold"><i class="fas fa-plus me-1"></i> Create Exam</a>
+      <h1 class="fw-extrabold"><i class="fas fa-graduation-cap text-success me-2"></i>الاختبارات المباشرة</h1>
+      <a href="{% url 'market:admin_exam_create' %}" class="btn btn-primary fw-bold"><i class="fas fa-plus me-1"></i> إضافة اختبار</a>
     </div>
 
     <div class="card shadow border-0 rounded-4 overflow-hidden">
       <table class="table table-hover align-middle mb-0">
         <thead class="table-dark">
           <tr>
-            <th>Title</th>
-            <th>Duration</th>
-            <th>Questions</th>
-            <th>Status</th>
-            <th class="text-end">Actions</th>
+            <th>العنوان</th>
+            <th>المدة</th>
+            <th>الأسئلة</th>
+            <th>الحالة</th>
+            <th class="text-end">الإجراءات</th>
           </tr>
         </thead>
         <tbody>
@@ -30,9 +30,9 @@
             <td><span class="badge badge-soft-primary">{{ exam.questions.count }}</span></td>
             <td>
               {% if exam.is_published %}
-              <span class="badge bg-success"><i class="fas fa-eye me-1"></i> Published (Live)</span>
+              <span class="badge bg-success"><i class="fas fa-eye me-1"></i> منشور ومباشر</span>
               {% else %}
-              <span class="badge bg-secondary"><i class="fas fa-eye-slash me-1"></i> Draft (Hidden)</span>
+              <span class="badge bg-secondary"><i class="fas fa-eye-slash me-1"></i> مسودة مخفية</span>
               {% endif %}
             </td>
             <td class="text-end">
@@ -64,7 +64,7 @@
           <tr class="collapse" id="questionsExam{{ exam.id }}">
             <td colspan="5" class="bg-light">
               <div class="p-3">
-                <h6 class="fw-bold mb-3 text-secondary">Questions in this Exam:</h6>
+                <h6 class="fw-bold mb-3 text-secondary">أسئلة الاختبار:</h6>
                 {% for q in exam.questions.all %}
                   <div class="card p-3 mb-2 border-0 shadow-sm rounded-3">
                     <div class="d-flex justify-content-between align-items-start">
@@ -92,18 +92,18 @@
                       </ul>
                     {% elif q.question_type == 'short' %}
                       <div class="mt-2 text-success">
-                        <strong>Correct Answer:</strong> <code>{{ q.short_answer_correct }}</code>
+                        <strong>الإجابة الصحيحة:</strong> <code>{{ q.short_answer_correct }}</code>
                       </div>
                     {% endif %}
                   </div>
                 {% empty %}
-                  <div class="text-muted small">No questions added yet.</div>
+                  <div class="text-muted small">لا توجد أسئلة مضافة بعد.</div>
                 {% endfor %}
               </div>
             </td>
           </tr>
           {% empty %}
-          <tr><td colspan="5" class="text-center text-muted py-4">No exams created yet.</td></tr>
+          <tr><td colspan="5" class="text-center text-muted py-4">لا توجد اختبارات مضافة بعد.</td></tr>
           {% endfor %}
         </tbody>
       </table>

@@ -1,24 +1,24 @@
 {% extends 'base.html' %}
-{% block title %}Admin Dashboard{% endblock title %}
+{% block title %}لوحة الإدارة{% endblock title %}
 {% block body %}
 <section class="py-4">
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
       <div>
-        <h1 class="mb-1 fw-extrabold"><i class="fas fa-user-shield text-warning me-2"></i>Competition Control Suite</h1>
-        <p class="text-muted mb-0">Manage teams, vehicles, component power levels, islands, exams, and competition states.</p>
+        <h1 class="mb-1 fw-extrabold"><i class="fas fa-user-shield text-warning me-2"></i>مركز إدارة المسابقة</h1>
+        <p class="text-muted mb-0">إدارة الفرق والمركبات والمكونات والجزر والاختبارات وحالة المسابقة.</p>
       </div>
       <div class="d-flex gap-2">
         <form method="post" action="{% url 'market:admin_competition_toggle' %}" class="d-inline">
           {% csrf_token %}
           {% if comp_state.status == 'active' %}
-            <button type="submit" name="action" value="pause" class="btn btn-warning fw-bold"><i class="fas fa-pause me-1"></i> Pause Competition</button>
+            <button type="submit" name="action" value="pause" class="btn btn-warning fw-bold"><i class="fas fa-pause me-1"></i> إيقاف مؤقت</button>
           {% elif comp_state.status == 'paused' %}
-            <button type="submit" name="action" value="resume" class="btn btn-success fw-bold"><i class="fas fa-play me-1"></i> Resume Competition</button>
+            <button type="submit" name="action" value="resume" class="btn btn-success fw-bold"><i class="fas fa-play me-1"></i> استئناف المسابقة</button>
           {% else %}
-            <button type="submit" name="action" value="start" class="btn btn-success fw-bold"><i class="fas fa-play me-1"></i> Start Competition</button>
+            <button type="submit" name="action" value="start" class="btn btn-success fw-bold"><i class="fas fa-play me-1"></i> بدء المسابقة</button>
           {% endif %}
-          <button type="submit" name="action" value="finish" class="btn btn-danger fw-bold"><i class="fas fa-flag-checkered me-1"></i> Finish</button>
+          <button type="submit" name="action" value="finish" class="btn btn-danger fw-bold"><i class="fas fa-flag-checkered me-1"></i> إنهاء المسابقة</button>
         </form>
       </div>
     </div>
@@ -29,7 +29,7 @@
         <div class="stat-card fade-in-up">
           <div class="stat-icon"><i class="fas fa-users text-primary"></i></div>
           <div>
-            <p class="stat-label mb-0">Total Teams</p>
+            <p class="stat-label mb-0">إجمالي الفرق</p>
             <p class="stat-value">{{ teams_count }}</p>
           </div>
         </div>
@@ -38,7 +38,7 @@
         <div class="stat-card fade-in-up">
           <div class="stat-icon"><i class="fas fa-car text-warning"></i></div>
           <div>
-            <p class="stat-label mb-0">Vehicles Configured</p>
+            <p class="stat-label mb-0">المركبات المضافة</p>
             <p class="stat-value">{{ vehicles_count }}</p>
           </div>
         </div>
@@ -47,7 +47,7 @@
         <div class="stat-card fade-in-up">
           <div class="stat-icon"><i class="fas fa-cogs text-info"></i></div>
           <div>
-            <p class="stat-label mb-0">Power Levels</p>
+            <p class="stat-label mb-0">مستويات القوة</p>
             <p class="stat-value">{{ components_count }}</p>
           </div>
         </div>
@@ -56,7 +56,7 @@
         <div class="stat-card fade-in-up">
           <div class="stat-icon"><i class="fas fa-graduation-cap text-success"></i></div>
           <div>
-            <p class="stat-label mb-0">Live Exams</p>
+            <p class="stat-label mb-0">الاختبارات المباشرة</p>
             <p class="stat-value">{{ exams_count }}</p>
           </div>
         </div>
@@ -66,36 +66,36 @@
     <!-- Admin Quick Nav Buttons -->
     <div class="row g-3 mb-4">
       <div class="col-md-2 col-6">
-        <a href="{% url 'market:admin_teams' %}" class="btn btn-dark w-100 py-3 fw-bold shadow-sm"><i class="fas fa-users d-block fs-4 mb-1"></i> Manage Teams</a>
+        <a href="{% url 'market:admin_teams' %}" class="btn btn-dark w-100 py-3 fw-bold shadow-sm"><i class="fas fa-users d-block fs-4 mb-1"></i> إدارة الفرق</a>
       </div>
       <div class="col-md-2 col-6">
-        <a href="{% url 'market:admin_vehicles' %}" class="btn btn-dark w-100 py-3 fw-bold shadow-sm"><i class="fas fa-car d-block fs-4 mb-1"></i> Vehicles</a>
+        <a href="{% url 'market:admin_vehicles' %}" class="btn btn-dark w-100 py-3 fw-bold shadow-sm"><i class="fas fa-car d-block fs-4 mb-1"></i> المركبات</a>
       </div>
       <div class="col-md-2 col-6">
-        <a href="{% url 'market:admin_components' %}" class="btn btn-dark w-100 py-3 fw-bold shadow-sm"><i class="fas fa-microchip d-block fs-4 mb-1"></i> Power Levels</a>
+        <a href="{% url 'market:admin_components' %}" class="btn btn-dark w-100 py-3 fw-bold shadow-sm"><i class="fas fa-microchip d-block fs-4 mb-1"></i> مستويات القوة</a>
       </div>
       <div class="col-md-2 col-6">
-        <a href="{% url 'market:admin_islands' %}" class="btn btn-dark w-100 py-3 fw-bold shadow-sm"><i class="fas fa-umbrella-beach d-block fs-4 mb-1"></i> Islands</a>
+        <a href="{% url 'market:admin_islands' %}" class="btn btn-dark w-100 py-3 fw-bold shadow-sm"><i class="fas fa-umbrella-beach d-block fs-4 mb-1"></i> الجزر</a>
       </div>
       <div class="col-md-2 col-6">
-        <a href="{% url 'market:admin_exams' %}" class="btn btn-dark w-100 py-3 fw-bold shadow-sm"><i class="fas fa-file-alt d-block fs-4 mb-1"></i> Exams</a>
+        <a href="{% url 'market:admin_exams' %}" class="btn btn-dark w-100 py-3 fw-bold shadow-sm"><i class="fas fa-file-alt d-block fs-4 mb-1"></i> الاختبارات</a>
       </div>
       <div class="col-md-2 col-6">
-        <a href="{% url 'market:admin_reports' %}" class="btn btn-warning text-dark w-100 py-3 fw-bold shadow-sm"><i class="fas fa-chart-bar d-block fs-4 mb-1"></i> Reports & Export</a>
+        <a href="{% url 'market:admin_reports' %}" class="btn btn-warning text-dark w-100 py-3 fw-bold shadow-sm"><i class="fas fa-chart-bar d-block fs-4 mb-1"></i> التقارير والتصدير</a>
       </div>
     </div>
 
     <div class="row gy-4">
       <div class="col-lg-6">
         <div class="card shadow-sm p-4 border-0 fade-in-up">
-          <h4 class="section-heading mb-3">Live Travel History Log</h4>
+          <h4 class="section-heading mb-3">سجل الرحلات</h4>
           <ul class="list-group list-group-flush">
             {% for t in recent_travels %}
             <li class="list-group-item px-0 py-2">
-              <strong class="text-primary">{{ t.profile.display_name }}</strong> travelled to <strong>{{ t.to_island.name }}</strong> using {{ t.vehicle.name }} ({{ t.actual_travel_time_minutes }} min).
+              انتقل <strong class="text-primary">{{ t.profile.display_name }}</strong> إلى <strong>{{ t.to_island.name }}</strong> باستخدام {{ t.vehicle.name }} ({{ t.actual_travel_time_minutes }} دقيقة).
             </li>
             {% empty %}
-            <li class="list-group-item px-0 text-muted">No travel records yet.</li>
+            <li class="list-group-item px-0 text-muted">لا توجد رحلات مسجلة بعد.</li>
             {% endfor %}
           </ul>
         </div>
@@ -103,7 +103,7 @@
 
       <div class="col-lg-6">
         <div class="card shadow-sm p-4 border-0 fade-in-up">
-          <h4 class="section-heading mb-3">Recent Exam Submissions</h4>
+          <h4 class="section-heading mb-3">أحدث تسليمات الاختبارات</h4>
           <ul class="list-group list-group-flush">
             {% for s in recent_submissions %}
             <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
@@ -114,7 +114,7 @@
               <span class="badge badge-soft-success fs-6">{{ s.score }} / {{ s.total }} pts</span>
             </li>
             {% empty %}
-            <li class="list-group-item px-0 text-muted">No exam submissions yet.</li>
+            <li class="list-group-item px-0 text-muted">لا توجد تسليمات اختبارات بعد.</li>
             {% endfor %}
           </ul>
         </div>

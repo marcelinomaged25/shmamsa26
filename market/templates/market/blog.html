@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Blog{% endblock title %}
+{% block title %}المدونة{% endblock title %}
 
 {% block body %}
 <section class="py-4">
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
       <div>
-        <h1 class="mb-1">Conference Blog</h1>
-        <p class="text-muted mb-0">Read announcements, tips, and updates shared by admins. React to content with your team.</p>
+        <h1 class="mb-1">مدونة المسابقة</h1>
+        <p class="text-muted mb-0">تابع الإعلانات والنصائح والتحديثات، وتفاعل باسم فريقك.</p>
       </div>
       {% if user.is_authenticated %}
-      <a class="btn btn-outline-primary" href="{% url 'market:team_dashboard' %}">Back to Dashboard</a>
+      <a class="btn btn-outline-primary" href="{% url 'market:team_dashboard' %}">العودة للوحة التحكم</a>
       {% endif %}
     </div>
 
@@ -39,21 +39,21 @@
           <form method="post" action="{% url 'market:blog_react' post.id %}">
             {% csrf_token %}
             <input type="hidden" name="reaction_type" value="like" />
-            <button type="submit" class="btn btn-outline-success btn-sm">👍 Like</button>
+            <button type="submit" class="btn btn-outline-success btn-sm">👍 إعجاب</button>
           </form>
           <form method="post" action="{% url 'market:blog_react' post.id %}">
             {% csrf_token %}
             <input type="hidden" name="reaction_type" value="love" />
-            <button type="submit" class="btn btn-outline-danger btn-sm">❤️ Love</button>
+            <button type="submit" class="btn btn-outline-danger btn-sm">❤️ أحببته</button>
           </form>
           <form method="post" action="{% url 'market:blog_react' post.id %}">
             {% csrf_token %}
             <input type="hidden" name="reaction_type" value="clap" />
-            <button type="submit" class="btn btn-outline-warning btn-sm">👏 Clap</button>
+            <button type="submit" class="btn btn-outline-warning btn-sm">👏 تصفيق</button>
           </form>
         </div>
         {% else %}
-        <p class="text-muted mb-0">Please <a href="{% url 'login' %}">login</a> to react.</p>
+        <p class="text-muted mb-0">يرجى <a href="{% url 'login' %}">تسجيل الدخول</a> للتفاعل.</p>
         {% endif %}
       </div>
     </div>
@@ -61,7 +61,7 @@
     <div class="card shadow-sm p-4 border-0">
       <div class="empty-state">
         <i class="fas fa-newspaper"></i>
-        <p class="mb-0">No blog posts have been published yet.</p>
+        <p class="mb-0">لا توجد منشورات حتى الآن.</p>
       </div>
     </div>
     {% endfor %}

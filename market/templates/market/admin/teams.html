@@ -1,23 +1,23 @@
 {% extends 'base.html' %}
-{% block title %}Manage Teams{% endblock title %}
+{% block title %}إدارة الفرق{% endblock title %}
 {% block body %}
 <section class="py-4">
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1 class="fw-extrabold"><i class="fas fa-users text-primary me-2"></i>Manage Teams</h1>
-      <a href="{% url 'market:admin_team_create' %}" class="btn btn-primary fw-bold"><i class="fas fa-plus me-1"></i> Create New Team</a>
+      <h1 class="fw-extrabold"><i class="fas fa-users text-primary me-2"></i>إدارة الفرق</h1>
+      <a href="{% url 'market:admin_team_create' %}" class="btn btn-primary fw-bold"><i class="fas fa-plus me-1"></i> إضافة فريق</a>
     </div>
     <div class="card shadow border-0 rounded-4 overflow-hidden">
       <table class="table table-hover align-middle mb-0">
         <thead class="table-dark">
           <tr>
-            <th>Username</th>
-            <th>Team Name</th>
-            <th>Members</th>
-            <th>Coins Balance</th>
-            <th>Current Island</th>
-            <th>Progress</th>
-            <th class="text-end">Actions</th>
+            <th>اسم المستخدم</th>
+            <th>الفريق</th>
+            <th>الأعضاء</th>
+            <th>الرصيد</th>
+            <th>الجزيرة الحالية</th>
+            <th>التقدم</th>
+            <th class="text-end">الإجراءات</th>
           </tr>
         </thead>
         <tbody>
@@ -66,22 +66,22 @@
                     <form method="post" action="{% url 'market:admin_team_adjust_coins' team.id %}">
                       {% csrf_token %}
                       <div class="modal-body">
-                        <p class="text-muted small">Current balance: <strong>${{ team.coins }}</strong></p>
+                        <p class="text-muted small">الرصيد الحالي: <strong>${{ team.coins }}</strong></p>
                         <div class="mb-3">
-                          <label class="form-label fw-bold">Action</label>
+                          <label class="form-label fw-bold">الإجراء</label>
                           <select name="action" class="form-select" required>
-                            <option value="add">Add Coins</option>
-                            <option value="deduct">Deduct Coins</option>
-                            <option value="set">Set Exact Balance</option>
+                            <option value="add">إضافة عملات</option>
+                            <option value="deduct">خصم عملات</option>
+                            <option value="set">تعيين الرصيد</option>
                           </select>
                         </div>
                         <div class="mb-3">
-                          <label class="form-label fw-bold">Amount</label>
+                          <label class="form-label fw-bold">المبلغ</label>
                           <input type="number" step="0.01" name="amount" class="form-control" value="500" required>
                         </div>
                       </div>
                       <div class="modal-footer">
-                        <button type="submit" class="btn btn-success w-100 fw-bold">Apply</button>
+                        <button type="submit" class="btn btn-success w-100 fw-bold">تطبيق</button>
                       </div>
                     </form>
                   </div>
@@ -90,7 +90,7 @@
             </td>
           </tr>
           {% empty %}
-          <tr><td colspan="7" class="text-center text-muted py-4">No teams registered.</td></tr>
+          <tr><td colspan="7" class="text-center text-muted py-4">لا توجد فرق مسجلة.</td></tr>
           {% endfor %}
         </tbody>
       </table>
