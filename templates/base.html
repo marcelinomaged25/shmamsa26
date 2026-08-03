@@ -68,6 +68,18 @@
       position: relative;
       direction: rtl;
     }
+    input, textarea, select, .form-control, .form-select {
+      direction: rtl;
+      text-align: right;
+    }
+    input[type="email"], input[type="url"], input[name="username"], .ltr-value {
+      direction: ltr;
+      text-align: left;
+    }
+    .table { text-align: right; }
+    .modal-header .btn-close { margin: 0 auto 0 0; }
+    .form-check { padding-right: 1.5em; padding-left: 0; }
+    .form-check .form-check-input { float: right; margin-right: -1.5em; margin-left: 0; }
 
     /* Subtle grid background */
     body::before {

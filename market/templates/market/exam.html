@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Live Exam Challenge{% endblock title %}
+{% block title %}اختبار مباشر{% endblock title %}
 
 {% block body %}
 <section class="py-4">
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
       <div>
-        <h1 class="mb-1 fw-extrabold"><i class="fas fa-graduation-cap text-warning me-2"></i>Live Exam Challenge</h1>
-        <p class="text-muted mb-0">Score extra points for your team by demonstrating engineering and navigation mastery.</p>
+        <h1 class="mb-1 fw-extrabold"><i class="fas fa-graduation-cap text-warning me-2"></i>اختبار التحدي المباشر</h1>
+        <p class="text-muted mb-0">اكسب نقاطًا إضافية لفريقك بإثبات مهاراتك الهندسية ومهارات الملاحة.</p>
       </div>
       <div>
         <span class="badge badge-soft-primary fs-6"><i class="fas fa-users me-1"></i> {{ profile.display_name }}</span>
@@ -21,23 +21,23 @@
     {% elif submitted %}
       <div class="card shadow-lg p-5 border-0 rounded-4 fade-in-up text-center mb-4">
         <i class="fas fa-check-circle text-success mb-3" style="font-size: 3.5rem;"></i>
-        <h2 class="fw-bold mb-1">Exam Submitted!</h2>
+        <h2 class="fw-bold mb-1">تم تسليم الاختبار!</h2>
         <p class="text-muted mb-3">{{ exam.title }}</p>
         <div class="d-inline-block bg-light p-3 rounded-4 border mb-4">
-          <span class="fs-3 fw-extrabold text-primary">{{ submission.score }} / {{ submission.total }} Points</span>
+            <span class="fs-3 fw-extrabold text-primary">{{ submission.score }} / {{ submission.total }} نقطة</span>
         </div>
-        <p class="text-muted small mb-0">Submission timestamp: {{ submission.submitted_at|date:'M d, Y H:i' }}</p>
+        <p class="text-muted small mb-0">وقت التسليم: {{ submission.submitted_at|date:'M d, Y H:i' }}</p>
       </div>
     {% else %}
       <div class="card hero-card border-0 p-3 p-md-5 mb-4 fade-in-up">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
           <div>
-            <span class="badge bg-warning text-dark fw-bold mb-2">Total Points: {{ exam.total_points }}</span>
+            <span class="badge bg-warning text-dark fw-bold mb-2">إجمالي النقاط: {{ exam.total_points }}</span>
             <h2 class="fw-bold mb-2 fs-3 fs-md-2">{{ exam.title }}</h2>
             <p class="mb-0 col-lg-9 opacity-90 small fs-md-6">{{ exam.description }}</p>
           </div>
           <div class="text-center bg-dark p-3 rounded-4 border border-secondary w-100 w-sm-auto">
-            <span class="text-muted small text-uppercase d-block" style="letter-spacing:.05em;">Time Remaining</span>
+            <span class="text-muted small d-block" style="letter-spacing:.05em;">الوقت المتبقي</span>
             <div id="examTimer" class="fs-2 fw-extrabold text-warning" data-duration="{{ remaining_seconds }}">--:--</div>
           </div>
         </div>
@@ -54,7 +54,7 @@
               <span class="badge bg-primary me-2">Q{{ forloop.counter }}</span>
               {{ q.question_text }}
             </h5>
-            <span class="badge badge-soft-info">{{ q.points }} Points</span>
+            <span class="badge badge-soft-info">{{ q.points }} نقطة</span>
           </div>
 
           {% if q.question_type == 'mcq' or q.question_type == 'tf' %}
@@ -74,7 +74,7 @@
         {% endfor %}
 
         <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold py-3 shadow mb-5">
-          <i class="fas fa-paper-plane me-2"></i> Submit Exam Answers
+          <i class="fas fa-paper-plane me-2"></i> تسليم إجابات الاختبار
         </button>
       </form>
     {% endif %}

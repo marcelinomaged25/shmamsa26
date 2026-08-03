@@ -2,7 +2,7 @@
 {% load static %}
 {% load bootstrap4 %}
 
-{% block title %}Edit Profile{% endblock title %}
+{% block title %}تعديل الملف الشخصي{% endblock title %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/profile_edit.css' %}">
@@ -16,7 +16,7 @@
       <div class="col-lg-8 col-md-10">
         <div class="card shadow-sm border-0 fade-in-up">
           <div class="card-body p-4 p-md-5">
-            <h2 class="text-center fw-bold mb-4">Edit Profile</h2>
+            <h2 class="text-center fw-bold mb-4">تعديل الملف الشخصي</h2>
 
             <!-- Profile Edit Form -->
             <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
@@ -24,19 +24,19 @@
 
               <!-- User Form Fields -->
               <div class="mb-4">
-                <h5 class="section-heading mb-3">User Information</h5>
+                <h5 class="section-heading mb-3">بيانات المستخدم</h5>
                 {% bootstrap_form userform %}
               </div>
 
               <!-- Profile Form Fields -->
               <div class="mb-4">
-                <h5 class="section-heading mb-3">Profile Details</h5>
+                <h5 class="section-heading mb-3">تفاصيل الفريق</h5>
                 {% bootstrap_form profileform %}
               </div>
 
               <!-- Submit Button -->
               <div class="d-grid gap-2 mt-4">
-                <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save me-2"></i>Save Changes</button>
+                <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save me-2"></i>حفظ التغييرات</button>
               </div>
             </form>
           </div>

@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Vehicle Assembly Yard{% endblock title %}
+{% block title %}ساحة تجميع المركبات{% endblock title %}
 
 {% block body %}
 <section class="py-4">
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
       <div>
-        <h1 class="mb-1 fw-extrabold"><i class="fas fa-tools text-primary me-2"></i>Vehicle Assembly Yard</h1>
+        <h1 class="mb-1 fw-extrabold"><i class="fas fa-tools text-primary me-2"></i>ساحة تجميع المركبات</h1>
         <p class="text-muted mb-0">Enforced progression sequence: <strong>Submarine → Boat → Car → Airplane → Horse Carriage → Train → Bicycle</strong></p>
       </div>
       <div>
-        <a href="{% url 'market:team_shop' %}" class="btn btn-outline-primary fw-bold"><i class="fas fa-store me-1"></i> Buy Components</a>
+        <a href="{% url 'market:team_shop' %}" class="btn btn-outline-primary fw-bold"><i class="fas fa-store me-1"></i> شراء المكونات</a>
       </div>
     </div>
 
@@ -35,7 +35,7 @@
             <div class="progress-bar" role="progressbar" style="width: {{ assembly.power_percentage }}%;"></div>
           </div>
 
-          <h5 class="fw-bold mb-3"><i class="fas fa-list-check text-primary me-2"></i>Required Component Types</h5>
+          <h5 class="fw-bold mb-3"><i class="fas fa-list-check text-primary me-2"></i>المكونات المطلوبة</h5>
           <div class="row g-3">
             {% for req in req_details %}
             <div class="col-md-6">
@@ -62,7 +62,7 @@
                     {% endfor %}
                   </div>
                 {% else %}
-                  <small class="text-muted italic">No {{ req.requirement.component_type.name }} allocated yet.</small>
+                  <small class="text-muted italic">لم يتم تخصيص {{ req.requirement.component_type.name }} بعد.</small>
                 {% endif %}
               </div>
             </div>
@@ -74,12 +74,12 @@
       <!-- Component Allocation Form -->
       <div class="col-lg-4">
         <div class="card shadow-sm p-4 border-0 fade-in-up">
-          <h4 class="section-heading mb-3">Allocate Components</h4>
+          <h4 class="section-heading mb-3">تخصيص المكونات</h4>
           {% if inventory %}
             <form method="post" action="{% url 'market:allocate_component' %}">
               {% csrf_token %}
               <div class="mb-3">
-                <label class="form-label small text-muted text-uppercase fw-bold">Select Component</label>
+                <label class="form-label small text-muted fw-bold">اختر المكوّن</label>
                 <select name="power_level_id" class="form-select form-select-lg" required>
                   {% for inv in inventory %}
                     <option value="{{ inv.power_level.id }}">
@@ -90,7 +90,7 @@
               </div>
 
               <div class="mb-3">
-                <label class="form-label small text-muted text-uppercase fw-bold">Quantity</label>
+                <label class="form-label small text-muted fw-bold">الكمية</label>
                 <input type="number" name="quantity" class="form-control form-control-lg" value="1" min="1" required>
               </div>
 
@@ -101,8 +101,8 @@
           {% else %}
             <div class="empty-state py-4">
               <i class="fas fa-boxes-stacked" style="font-size:2.5rem;"></i>
-              <p class="mb-2 text-muted">No components available in inventory.</p>
-              <a href="{% url 'market:team_shop' %}" class="btn btn-sm btn-outline-primary fw-bold">Go to Component Shop</a>
+              <p class="mb-2 text-muted">لا توجد مكونات متاحة في المخزون.</p>
+              <a href="{% url 'market:team_shop' %}" class="btn btn-sm btn-outline-primary fw-bold">اذهب إلى المتجر</a>
             </div>
           {% endif %}
         </div>
@@ -111,10 +111,10 @@
     {% else %}
     <div class="card shadow-lg p-5 text-center border-0 rounded-4 fade-in-up">
       <i class="fas fa-trophy text-warning mb-3" style="font-size: 4rem;"></i>
-      <h2 class="fw-extrabold text-primary">All Vehicles Assembled!</h2>
-      <p class="lead text-muted">Your team has completed assembly of all 7 vehicles in the competition sequence!</p>
+      <h2 class="fw-extrabold text-primary">اكتمل تجميع كل المركبات!</h2>
+      <p class="lead text-muted">أكمل فريقك كل وسائل النقل السبع في تسلسل المسابقة.</p>
       <div>
-        <a href="{% url 'market:team_dashboard' %}" class="btn btn-primary btn-lg fw-bold"><i class="fas fa-tachometer-alt me-1"></i> Return to Dashboard</a>
+        <a href="{% url 'market:team_dashboard' %}" class="btn btn-primary btn-lg fw-bold"><i class="fas fa-tachometer-alt me-1"></i> العودة للوحة التحكم</a>
       </div>
     </div>
     {% endif %}
