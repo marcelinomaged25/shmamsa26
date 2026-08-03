@@ -77,7 +77,7 @@
           <h4 class="section-heading mb-3">وسيلة التنقل الحالية</h4>
           {% if current_assembly %}
             <div class="p-3 rounded-4 border mb-3" style="background: rgba(255,255,255,0.03); border-color: var(--glass-border) !important;">
-              <div class="neo-img-container lg mb-3">
+              <div class="neo-img-container vehicle-image-preview mb-3">
                 {% if current_assembly.vehicle.image %}
                   <img src="{{ current_assembly.vehicle.image.url }}" alt="{{ current_assembly.vehicle.name }}">
                 {% else %}
