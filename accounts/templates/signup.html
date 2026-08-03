@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}sign up{% endblock title %}
+{% block title %}إنشاء حساب{% endblock title %}
 {% block body %}
 {% load bootstrap4 %}
 <section class="py-5">
@@ -8,16 +8,16 @@
       <div class="col-lg-6 col-md-8">
         <div class="card shadow-sm p-4 border-0 fade-in-up">
           <div class="text-center mb-4">
-            <h2 class="fw-bold">Create Team Account</h2>
-            <p class="text-muted small">Sign up to join the competition and start building products.</p>
+            <h2 class="fw-bold">إنشاء حساب فريق</h2>
+            <p class="text-muted small">أنشئ حسابك وابدأ رحلة الجزر.</p>
           </div>
           <form method="post">
             {% csrf_token %}
             {% bootstrap_form form %}
-            <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Register Team</button>
+            <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">تسجيل الفريق</button>
           </form>
           <div class="text-center mt-3">
-            <span class="text-muted small">Already registered?</span> <a href="{% url 'login' %}" class="small text-decoration-none fw-semibold">Login here</a>
+            <span class="text-muted small">لديك حساب بالفعل؟</span> <a href="{% url 'login' %}" class="small text-decoration-none fw-semibold">ادخل من هنا</a>
           </div>
         </div>
       </div>

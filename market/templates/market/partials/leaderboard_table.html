@@ -1,52 +1,43 @@
 <div class="table-responsive">
 <table class="table table-hover align-middle mb-0">
-  <thead class="table-dark text-uppercase small">
+  <thead class="text-uppercase small">
     <tr>
-      <th scope="col">Rank</th>
-      <th scope="col">Team</th>
-      <th scope="col">Vehicle Progress</th>
-      <th scope="col">Current Island</th>
-      <th scope="col">Travel Time</th>
-      <th scope="col">Delay</th>
-      <th scope="col">Coins</th>
+      <th scope="col">الترتيب</th>
+      <th scope="col">الفريق</th>
+      <th scope="col">المركبة</th>
+      <th scope="col">الجزيرة الحالية</th>
+      <th scope="col">الوقت</th>
+      <th scope="col">التأخير</th>
+      <th scope="col">العملات</th>
     </tr>
   </thead>
   <tbody>
     {% for team in leaderboard %}
     <tr class="{% if team.rank == 1 %}table-warning fw-bold{% elif team.rank == 2 %}table-light{% elif team.rank == 3 %}table-light{% endif %}">
       <td>
-        {% if team.rank == 1 %}
-          <span class="badge bg-warning text-dark fs-6"><i class="fas fa-trophy me-1"></i> #1</span>
-        {% elif team.rank == 2 %}
-          <span class="badge bg-secondary fs-6"><i class="fas fa-medal me-1"></i> #2</span>
-        {% elif team.rank == 3 %}
-          <span class="badge bg-danger fs-6"><i class="fas fa-award me-1"></i> #3</span>
-        {% else %}
-          <span class="fw-bold text-muted">#{{ team.rank }}</span>
-        {% endif %}
+        <span class="fw-bold">#{{ team.rank }}</span>
       </td>
       <td>
         <strong class="fs-6 d-block">{{ team.team_name }}</strong>
       </td>
       <td>
         <span class="badge badge-soft-primary fs-7 mb-1">{{ team.current_vehicle }}</span>
-        <div class="progress" style="height: 6px; width: 100px;">
+        <div class="progress" style="height: 6px; width: 110px;">
           <div class="progress-bar" style="width: {{ team.completed_vehicles }}0%;"></div>
         </div>
-        <small class="text-muted" style="font-size: 0.75rem;">{{ team.completed_vehicles }}/7 Completed</small>
+        <small class="text-muted" style="font-size: 0.75rem;">{{ team.completed_vehicles }}/7 مكتملة</small>
       </td>
       <td>
         <span class="badge badge-soft-info"><i class="fas fa-umbrella-beach me-1"></i>{{ team.current_island }}</span>
       </td>
-
       <td>
-        <span><i class="far fa-clock me-1 text-muted"></i>{{ team.total_time }} min</span>
+        <span><i class="far fa-clock me-1 text-muted"></i>{{ team.total_time }} دقيقة</span>
       </td>
       <td>
         {% if team.total_delay > 0 %}
-          <span class="text-danger fw-bold">+{{ team.total_delay }} min</span>
+          <span class="text-danger fw-bold">+{{ team.total_delay }} دقيقة</span>
         {% else %}
-          <span class="text-success fw-bold">0 min</span>
+          <span class="text-success fw-bold">0 دقيقة</span>
         {% endif %}
       </td>
       <td>
@@ -55,7 +46,7 @@
     </tr>
     {% empty %}
     <tr>
-      <td colspan="7" class="text-center py-4 text-muted">No competing teams registered yet.</td>
+      <td colspan="7" class="text-center py-4 text-muted">لا توجد فرق مشاركة حتى الآن.</td>
     </tr>
     {% endfor %}
   </tbody>

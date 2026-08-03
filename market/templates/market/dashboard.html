@@ -1,124 +1,127 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Team Dashboard{% endblock title %}
+{% block title %}لوحة التحكم{% endblock title %}
 
 {% block body %}
 <section class="py-4">
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
       <div>
-        <h1 class="mb-1 fw-extrabold fs-2 fs-md-1"><i class="fas fa-users-cog text-primary me-2"></i>{{ profile.display_name }}</h1>
-        <p class="text-muted mb-0">Members: <strong>{{ profile.members_list|default:"Alice & Bob" }}</strong> | Location: <span class="badge badge-soft-info"><i class="fas fa-umbrella-beach me-1"></i>{{ profile.current_island.name|default:"Start Dock" }}</span></p>
+        <h1 class="mb-1"><i class="fas fa-users-cog text-warning me-2"></i>{{ profile.display_name }}</h1>
+        <p class="text-muted mb-0">
+          الأعضاء: <strong>{{ profile.members_list|default:"أليس وبوب" }}</strong>
+          <span class="mx-2">|</span>
+          الموقع الحالي: <span class="badge badge-soft-info"><i class="fas fa-umbrella-beach me-1"></i>{{ profile.current_island.name|default:"رصيف البداية" }}</span>
+        </p>
       </div>
       <div class="d-flex gap-2 w-100 w-sm-auto">
-        <a class="btn btn-outline-primary fw-bold flex-fill" href="{% url 'market:team_shop' %}"><i class="fas fa-shopping-cart me-1"></i> Shop</a>
-        <a class="btn btn-primary fw-bold flex-fill" href="{% url 'market:vehicle_assembly' %}"><i class="fas fa-tools me-1"></i> Assembly Yard</a>
+        <a class="btn btn-outline-primary fw-bold flex-fill" href="{% url 'market:team_shop' %}"><i class="fas fa-shopping-cart me-1"></i> المتجر</a>
+        <a class="btn btn-primary fw-bold flex-fill" href="{% url 'market:vehicle_assembly' %}"><i class="fas fa-tools me-1"></i> ساحة التجميع</a>
       </div>
     </div>
 
-    <!-- Stat Metrics -->
     <div class="row g-3 mb-4">
-      <div class="col-lg-4 col-sm-6 col-12">
+      <div class="col-lg-4 col-sm-6">
         <div class="stat-card fade-in-up">
           <div class="stat-icon"><i class="fas fa-coins text-warning"></i></div>
           <div>
-            <p class="stat-label mb-0">Coins Balance</p>
-            <p class="stat-value text-success">${{ profile.coins }}</p>
+            <p class="stat-label">الرصيد</p>
+            <p class="stat-value">${{ profile.coins }}</p>
           </div>
         </div>
       </div>
-      <div class="col-lg-4 col-sm-6 col-12">
+      <div class="col-lg-4 col-sm-6">
         <div class="stat-card fade-in-up">
           <div class="stat-icon"><i class="fas fa-trophy text-primary"></i></div>
           <div>
-            <p class="stat-label mb-0">Completed Vehicles</p>
+            <p class="stat-label">المركبات المكتملة</p>
             <p class="stat-value">{{ profile.completed_vehicles_count }}/7</p>
           </div>
         </div>
       </div>
-      <div class="col-lg-4 col-sm-12 col-12">
+      <div class="col-lg-4 col-sm-12">
         <div class="stat-card fade-in-up">
           <div class="stat-icon"><i class="fas fa-clock text-danger"></i></div>
           <div>
-            <p class="stat-label mb-0">Total Delay</p>
-            <p class="stat-value text-danger">+{{ profile.total_delay }} min</p>
+            <p class="stat-label">إجمالي التأخير</p>
+            <p class="stat-value text-danger">+{{ profile.total_delay }} دقيقة</p>
           </div>
         </div>
       </div>
     </div>
 
+    <div class="card border-0 p-4 mb-4 fade-in-up">
+      <h4 class="section-heading mb-3">خريطة الرحلة</h4>
+      <div class="row g-3 align-items-stretch">
+        {% for island in islands %}
+        <div class="col-lg col-md-4 col-6">
+          <div class="p-3 rounded-4 h-100 {% if profile.current_island and profile.current_island.id == island.id %}border border-warning{% else %}border{% endif %}" style="background: rgba(255,255,255,0.03); border-color: var(--glass-border) !important;">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="badge badge-soft-warning">جزيرة {{ island.order }}</span>
+              {% if profile.current_island and profile.current_island.id == island.id %}
+              <span class="badge badge-soft-success">أنت هنا</span>
+              {% endif %}
+            </div>
+            <div class="fw-bold mb-1">{{ island.name }}</div>
+            <div class="text-muted small">{{ island.description|default:"محطة ضمن خط الرحلة" }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
     <div class="row gy-4">
-      <!-- Left Column: Active Vehicle & Island Travel -->
       <div class="col-lg-7">
-        <!-- Active Progression Vehicle -->
-        <div class="card shadow-sm p-4 mb-4 border-0 fade-in-up">
-          <h4 class="section-heading mb-3">Active Vehicle Assembly</h4>
+        <div class="card border-0 p-4 mb-4 fade-in-up">
+          <h4 class="section-heading mb-3">وسيلة التنقل الحالية</h4>
           {% if current_assembly %}
-            <div class="p-3 bg-light rounded-4 border mb-3">
-              <!-- Visual Vehicle Media Banner -->
-              <div class="card-media-wrapper item-media-container mb-3">
+            <div class="p-3 rounded-4 border mb-3" style="background: rgba(255,255,255,0.03); border-color: var(--glass-border) !important;">
+              <div class="neo-img-container lg mb-3">
                 {% if current_assembly.vehicle.image %}
-                  <img src="{{ current_assembly.vehicle.image.url }}" alt="{{ current_assembly.vehicle.name }}" class="card-media-img">
+                  <img src="{{ current_assembly.vehicle.image.url }}" alt="{{ current_assembly.vehicle.name }}">
                 {% else %}
                   <div class="text-center p-3">
-                    {% if "Submarine" in current_assembly.vehicle.name %}
-                      <i class="fas fa-subway media-placeholder-icon text-primary"></i>
-                    {% elif "Boat" in current_assembly.vehicle.name %}
-                      <i class="fas fa-ship media-placeholder-icon text-info"></i>
-                    {% elif "Car" in current_assembly.vehicle.name %}
-                      <i class="fas fa-car media-placeholder-icon text-success"></i>
-                    {% elif "Airplane" in current_assembly.vehicle.name %}
-                      <i class="fas fa-plane media-placeholder-icon text-warning"></i>
-                    {% elif "Horse" in current_assembly.vehicle.name %}
-                      <i class="fas fa-horse media-placeholder-icon text-danger"></i>
-                    {% elif "Train" in current_assembly.vehicle.name %}
-                      <i class="fas fa-train media-placeholder-icon text-purple"></i>
-                    {% elif "Bicycle" in current_assembly.vehicle.name %}
-                      <i class="fas fa-bicycle media-placeholder-icon text-success"></i>
-                    {% else %}
-                      <i class="fas fa-space-shuttle media-placeholder-icon text-primary"></i>
-                    {% endif %}
+                    <i class="fas fa-route neo-img-placeholder"></i>
                   </div>
                 {% endif %}
               </div>
 
-              <div class="d-flex justify-content-between align-items-center mb-2">
+              <div class="d-flex justify-content-between align-items-center mb-2 gap-2 flex-wrap">
                 <h4 class="fw-bold mb-0 text-primary">
                   <span class="badge bg-primary me-2">#{{ current_assembly.vehicle.progression_order }}</span>
                   {{ current_assembly.vehicle.name }}
                 </h4>
-                <span class="badge badge-soft-warning fs-6">{{ current_assembly.power_percentage }}% Power</span>
+                <span class="badge badge-soft-warning fs-6">{{ current_assembly.power_percentage }}% قوة</span>
               </div>
               <p class="text-muted small mb-3">{{ current_assembly.vehicle.description }}</p>
-              
+
               <div class="progress mb-2" style="height: 12px;">
                 <div class="progress-bar" role="progressbar" style="width: {{ current_assembly.power_percentage }}%;"></div>
               </div>
               <div class="d-flex justify-content-between small text-muted">
-                <span>Collected Power: <strong>{{ current_assembly.total_power }}</strong></span>
-                <span>Max Power: <strong>{{ current_assembly.vehicle.max_possible_power }}</strong></span>
+                <span>الطاقة المجمعة: <strong>{{ current_assembly.total_power }}</strong></span>
+                <span>الحد الأقصى: <strong>{{ current_assembly.vehicle.max_possible_power }}</strong></span>
               </div>
             </div>
             <a href="{% url 'market:vehicle_assembly' %}" class="btn btn-warning w-100 fw-bold py-2">
-              <i class="fas fa-wrench me-1"></i> Manage Component Allocations
+              <i class="fas fa-wrench me-1"></i> إدارة التجميع
             </a>
           {% else %}
             <div class="empty-state py-4">
-              <i class="fas fa-award text-warning" style="font-size:3rem;"></i>
-              <h5 class="fw-bold mt-2">All 7 Vehicles Assembled!</h5>
-              <p class="mb-0 text-muted">Your team has successfully completed every vehicle in the progression sequence!</p>
+              <i class="fas fa-award"></i>
+              <h5 class="fw-bold mt-2">اكتمل بناء كل المركبات</h5>
+              <p class="mb-0 text-muted">فريقك أنهى كل مراحل السباق بنجاح.</p>
             </div>
           {% endif %}
         </div>
 
-        <!-- Travel Action Box -->
-        <div class="card shadow-sm p-4 border-0 fade-in-up">
-          <h4 class="section-heading mb-3">Island Navigation</h4>
-          <div class="d-flex align-items-center justify-content-between p-3 rounded-4 bg-dark text-white mb-3">
+        <div class="card border-0 p-4 fade-in-up">
+          <h4 class="section-heading mb-3">الانتقال بين الجزر</h4>
+          <div class="d-flex align-items-center justify-content-between p-3 rounded-4 mb-3" style="background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);">
             <div>
-              <span class="text-muted small text-uppercase d-block" style="letter-spacing:0.05em;">Current Location</span>
-              <h5 class="fw-bold mb-0 text-warning"><i class="fas fa-map-marker-alt me-2"></i>{{ profile.current_island.name|default:"Start Dock" }}</h5>
+              <span class="text-muted small text-uppercase d-block" style="letter-spacing:0.05em;">الوجهة الحالية</span>
+              <h5 class="fw-bold mb-0 text-warning"><i class="fas fa-map-marker-alt me-2"></i>{{ profile.current_island.name|default:"رصيف البداية" }}</h5>
             </div>
             <i class="fas fa-ship fa-2x text-muted opacity-50"></i>
           </div>
@@ -126,31 +129,29 @@
           <form method="post" action="{% url 'market:travel_island' %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-success btn-lg w-100 fw-bold py-3 shadow" {% if not can_travel %}disabled{% endif %}>
-              <i class="fas fa-paper-plane me-2"></i> Travel To Next Island
+              <i class="fas fa-paper-plane me-2"></i> الانتقال إلى الجزيرة التالية
             </button>
           </form>
           {% if not can_travel %}
-            <small class="text-muted text-center d-block mt-2"><i class="fas fa-lock me-1"></i> Complete your next vehicle assembly to unlock island travel.</small>
+            <small class="text-muted text-center d-block mt-2"><i class="fas fa-lock me-1"></i> أكمل تجميع وسيلة التنقل التالية أولًا.</small>
           {% endif %}
         </div>
       </div>
 
-      <!-- Right Column: Travel History & Notifications -->
       <div class="col-lg-5">
-        <!-- Travel History -->
-        <div class="card shadow-sm p-4 mb-4 border-0 fade-in-up">
-          <h4 class="section-heading mb-3">Recent Travel History</h4>
+        <div class="card border-0 p-4 mb-4 fade-in-up">
+          <h4 class="section-heading mb-3">آخر الرحلات</h4>
           {% if travel_history %}
             <ul class="list-group list-group-flush">
               {% for leg in travel_history %}
                 <li class="list-group-item px-0 py-3">
-                  <div class="d-flex justify-content-between align-items-center mb-1">
-                    <strong class="text-primary">{{ leg.from_island.name }} → {{ leg.to_island.name }}</strong>
+                  <div class="d-flex justify-content-between align-items-center mb-1 gap-2 flex-wrap">
+                    <strong class="text-primary">{{ leg.from_island.name }} &rarr; {{ leg.to_island.name }}</strong>
                     <span class="badge badge-soft-primary">{{ leg.vehicle.name }}</span>
                   </div>
                   <div class="d-flex justify-content-between small text-muted">
-                    <span>Power: {{ leg.vehicle_power_percentage }}%</span>
-                    <span>Time: {{ leg.actual_travel_time_minutes }} min (+{{ leg.delay_minutes }} min delay)</span>
+                    <span>القوة: {{ leg.vehicle_power_percentage }}%</span>
+                    <span>الوقت: {{ leg.actual_travel_time_minutes }} دقيقة (+{{ leg.delay_minutes }} تأخير)</span>
                   </div>
                 </li>
               {% endfor %}
@@ -158,14 +159,13 @@
           {% else %}
             <div class="empty-state py-3">
               <i class="fas fa-route"></i>
-              <p class="mb-0">No travel legs logged yet.</p>
+              <p class="mb-0">لا توجد رحلات مسجلة بعد.</p>
             </div>
           {% endif %}
         </div>
 
-        <!-- Notifications -->
-        <div class="card shadow-sm p-4 border-0 fade-in-up">
-          <h4 class="section-heading mb-3">Team Notifications</h4>
+        <div class="card border-0 p-4 fade-in-up">
+          <h4 class="section-heading mb-3">الإشعارات</h4>
           {% if notifications %}
             <ul class="list-group list-group-flush mb-3">
               {% for n in notifications %}
@@ -178,12 +178,12 @@
             </ul>
             <form method="post" action="{% url 'market:mark_notifications_read' %}">
               {% csrf_token %}
-              <button type="submit" class="btn btn-sm btn-outline-secondary w-100">Mark all notifications read</button>
+              <button type="submit" class="btn btn-sm btn-outline-secondary w-100">تعليم الكل كمقروء</button>
             </form>
           {% else %}
             <div class="empty-state py-3">
               <i class="fas fa-bell-slash"></i>
-              <p class="mb-0">No new unread notifications.</p>
+              <p class="mb-0">لا توجد إشعارات جديدة.</p>
             </div>
           {% endif %}
         </div>
