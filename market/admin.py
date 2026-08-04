@@ -18,6 +18,7 @@ from .models import (
     ExamAnswer,
     Notification,
 )
+from django.utils.html import format_html
 
 
 @admin.register(CompetitionState)
@@ -38,9 +39,16 @@ class ComponentTypeAdmin(admin.ModelAdmin):
 
 @admin.register(ComponentPowerLevel)
 class ComponentPowerLevelAdmin(admin.ModelAdmin):
-    list_display = ('name', 'component_type', 'power_value', 'price', 'stock')
+    list_display = ('name', 'component_type', 'power_value', 'price', 'stock', 'image_preview')
     list_filter = ('component_type',)
     search_fields = ('name',)
+    readonly_fields = ('image_preview',)
+
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="height: 50px; border-radius: 4px;" />', obj.image.url)
+        return "No Image"
+    image_preview.short_description = 'Preview'
 
 
 class VehicleRequirementInline(admin.TabularInline):
@@ -50,9 +58,16 @@ class VehicleRequirementInline(admin.TabularInline):
 
 @admin.register(Vehicle)
 class VehicleAdmin(admin.ModelAdmin):
-    list_display = ('progression_order', 'name', 'base_travel_time_minutes')
+    list_display = ('progression_order', 'name', 'base_travel_time_minutes', 'image_preview')
     ordering = ('progression_order',)
     inlines = [VehicleRequirementInline]
+    readonly_fields = ('image_preview',)
+
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="height: 50px; border-radius: 4px;" />', obj.image.url)
+        return "No Image"
+    image_preview.short_description = 'Preview'
 
 
 @admin.register(InventoryItem)
