@@ -7,98 +7,63 @@
       <h1 class="fw-extrabold"><i class="fas fa-users text-primary me-2"></i>إدارة الفرق</h1>
       <a href="{% url 'market:admin_team_create' %}" class="btn btn-primary fw-bold"><i class="fas fa-plus me-1"></i> إضافة فريق</a>
     </div>
-    <div class="card shadow border-0 rounded-4 overflow-hidden">
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="table-dark">
-            <tr>
-              <th>اسم المستخدم</th>
-              <th>الفريق</th>
-              <th>الأعضاء</th>
-              <th>الرصيد</th>
-              <th>الجزيرة الحالية</th>
-              <th>التقدم</th>
-              <th class="text-end">الإجراءات</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for team in teams %}
-            <tr>
-              <td><strong>{{ team.user.username }}</strong></td>
-              <td>{{ team.display_name }}</td>
-              <td><small>{{ team.members_list|default:"Not specified" }}</small></td>
-              <td><span class="badge badge-soft-success fs-6">${{ team.coins }}</span></td>
-              <td><span class="badge badge-soft-info">{{ team.current_island.name|default:"Start Dock" }}</span></td>
-              <td>
-                <small>{{ team.completed_vehicles_count }}/7 Vehicles</small>
-                <div class="progress" style="height: 4px; width: 60px;">
-                  <div class="progress-bar" style="width: {{ team.completed_vehicles_count }}0%;"></div>
-                </div>
-              </td>
-              <td class="text-end">
-                <div class="d-flex gap-1 justify-content-end flex-wrap">
 
-                  <!-- Coin Adjustment -->
-                  <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#coinModal{{ team.id }}">
-                    <i class="fas fa-coins"></i>
-                  </button>
+    {% for team in teams %}
+    <div class="card neo-card mb-3">
+      <div class="card-body p-3">
+        <div class="row align-items-center g-3">
+          <!-- Team Info -->
+          <div class="col-md-3">
+            <h5 class="fw-bold mb-1">{{ team.user.username }}</h5>
+            <small class="text-muted">{{ team.display_name }}</small>
+            {% if team.members_list %}
+            <br><small class="text-muted"><i class="fas fa-users me-1"></i>{{ team.members_list }}</small>
+            {% endif %}
+          </div>
 
-                  <!-- Reset Progress -->
-                  <form method="post" action="{% url 'market:admin_team_reset' team.id %}" class="d-inline" onsubmit="return confirm('RESET all progress for {{ team.display_name }}? This clears assemblies, inventory, travel history, and exam submissions.')">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-outline-warning"><i class="fas fa-undo"></i></button>
-                  </form>
+          <!-- Stats -->
+          <div class="col-md-3 d-flex gap-2 flex-wrap">
+            <span class="badge badge-soft-success fs-6">${{ team.coins }}</span>
+            <span class="badge badge-soft-info">{{ team.current_island.name|default:"Start Dock" }}</span>
+            <span class="badge badge-soft-warning">{{ team.completed_vehicles_count }}/7</span>
+          </div>
 
-                  <!-- Delete -->
-                  <form method="post" action="{% url 'market:admin_team_delete' team.id %}" class="d-inline" onsubmit="return confirm('DELETE team {{ team.display_name }}? This cannot be undone.')">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
-                  </form>
-                </div>
-              </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="7" class="text-center text-muted py-4">لا توجد فرق مسجلة.</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
+          <!-- Coin Adjustment Form (INLINE - no modal needed) -->
+          <div class="col-md-4">
+            <form method="post" action="{% url 'market:admin_team_adjust_coins' team.id %}" class="d-flex gap-2 align-items-end flex-wrap">
+              {% csrf_token %}
+              <select name="action" class="form-select form-select-sm" style="width: 110px;" required>
+                <option value="add">إضافة</option>
+                <option value="deduct">خصم</option>
+                <option value="set">تعيين</option>
+              </select>
+              <input type="number" step="0.01" name="amount" class="form-control form-control-sm" value="500" style="width: 100px;" required>
+              <button type="submit" class="btn btn-sm btn-success fw-bold px-3"><i class="fas fa-check me-1"></i>تطبيق</button>
+            </form>
+          </div>
+
+          <!-- Actions -->
+          <div class="col-md-2 text-end">
+            <div class="d-flex gap-1 justify-content-end">
+              <!-- Reset Progress -->
+              <form method="post" action="{% url 'market:admin_team_reset' team.id %}" class="d-inline" onsubmit="return confirm('RESET all progress for {{ team.display_name }}?')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-warning"><i class="fas fa-undo"></i></button>
+              </form>
+              <!-- Delete -->
+              <form method="post" action="{% url 'market:admin_team_delete' team.id %}" class="d-inline" onsubmit="return confirm('DELETE team {{ team.display_name }}?')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+    {% empty %}
+    <div class="text-center text-muted py-5">لا توجد فرق مسجلة.</div>
+    {% endfor %}
+
   </div>
 </section>
-
-<!-- Coin Adjustment Modals (outside the table to prevent clipping/submit issues) -->
-{% for team in teams %}
-<div class="modal fade" id="coinModal{{ team.id }}" tabindex="-1" aria-labelledby="coinModalLabel{{ team.id }}" aria-hidden="true">
-  <div class="modal-dialog modal-sm modal-dialog-centered">
-    <div class="modal-content rounded-4">
-      <div class="modal-header">
-        <h5 class="modal-title fw-bold" id="coinModalLabel{{ team.id }}">تعديل رصيد — {{ team.display_name }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form method="post" action="{% url 'market:admin_team_adjust_coins' team.id %}">
-        {% csrf_token %}
-        <div class="modal-body">
-          <p class="small" style="color: var(--text-muted);">الرصيد الحالي: <strong>${{ team.coins }}</strong></p>
-          <div class="mb-3">
-            <label class="form-label fw-bold">الإجراء</label>
-            <select name="action" class="form-select" required>
-              <option value="add">إضافة عملات</option>
-              <option value="deduct">خصم عملات</option>
-              <option value="set">تعيين الرصيد</option>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label class="form-label fw-bold">المبلغ</label>
-            <input type="number" step="0.01" name="amount" class="form-control" value="500" required>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-success w-100 fw-bold">تطبيق</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-{% endfor %}
 {% endblock body %}
