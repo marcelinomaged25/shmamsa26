@@ -250,19 +250,56 @@ def team_history(request):
     # Get purchased components
     purchases = PurchaseHistory.objects.filter(profile=profile).select_related('component', 'component__component_type').order_by('-purchased_at')
     
-    # Get completed vehicle assemblies
+    # Get ALL vehicle assemblies (completed and in-progress) with their allocated components
     assemblies = TeamVehicleAssembly.objects.filter(
-        profile=profile, 
-        is_completed=True
-    ).select_related('vehicle').order_by('-completed_at')
+        profile=profile
+    ).select_related('vehicle').prefetch_related(
+        'allocated_components__power_level__component_type',
+        'vehicle__requirements__component_type'
+    ).order_by('vehicle__progression_order')
     
-    # Get travel history for a complete timeline
+    # Get travel history
     travels = TravelHistory.objects.filter(profile=profile).select_related('from_island', 'to_island', 'vehicle').order_by('-departed_at')
+    
+    # Build enriched assembly data
+    assembly_data = []
+    for a in assemblies:
+        components = []
+        for alloc in a.allocated_components.all():
+            components.append({
+                'name': alloc.power_level.name,
+                'type': alloc.power_level.component_type.name,
+                'power': alloc.power_level.power_value,
+                'quantity': alloc.quantity,
+            })
+        requirements = []
+        for req in a.vehicle.requirements.all():
+            allocated_qty = sum(
+                alloc.quantity for alloc in a.allocated_components.all()
+                if alloc.power_level.component_type_id == req.component_type_id
+            )
+            requirements.append({
+                'type': req.component_type.name,
+                'required': req.quantity_required,
+                'allocated': allocated_qty,
+                'done': allocated_qty >= req.quantity_required,
+            })
+        # Get total cost from purchase history for this vehicle's components
+        total_cost = sum(
+            p.price_paid for p in purchases
+            if any(alloc.power_level_id == p.component_id for alloc in a.allocated_components.all())
+        )
+        assembly_data.append({
+            'assembly': a,
+            'components': components,
+            'requirements': requirements,
+            'total_cost': total_cost,
+        })
     
     return render(request, 'market/history.html', {
         'profile': profile,
         'purchases': purchases,
-        'assemblies': assemblies,
+        'assembly_data': assembly_data,
         'travels': travels,
         'comp_state': _get_competition_state(),
     })

@@ -1,6 +1,64 @@
 {% extends 'base.html' %}
 {% block title %}سجل النشاط - شماس محظوظ{% endblock title %}
 {% block body %}
+<style>
+  .vehicle-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .vehicle-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  }
+  .vehicle-detail {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s ease;
+  }
+  .vehicle-detail.show {
+    max-height: 600px;
+    padding-top: 16px;
+  }
+  .req-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.08);
+    overflow: hidden;
+  }
+  .req-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+  .component-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.85rem;
+    margin: 3px;
+  }
+  .travel-line {
+    position: relative;
+    padding-right: 24px;
+    border-right: 2px solid rgba(6,182,212,0.3);
+    margin-right: 8px;
+  }
+  .travel-line::before {
+    content: '';
+    position: absolute;
+    right: -6px;
+    top: 8px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #06b6d4;
+  }
+</style>
+
 <section class="py-5">
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -8,13 +66,114 @@
       <a href="{% url 'market:team_dashboard' %}" class="btn btn-outline-light fw-bold"><i class="fas fa-arrow-right me-1"></i> العودة للوحة التحكم</a>
     </div>
 
+    <!-- ===== VEHICLES SECTION ===== -->
+    <div class="card neo-card mb-4">
+      <div class="card-header bg-transparent border-0 pt-4 pb-2 px-4">
+        <h4 class="fw-bold m-0"><i class="fas fa-ship text-info me-2"></i>المركبات <small class="text-muted fw-normal">(اضغط على أي مركبة لعرض التفاصيل)</small></h4>
+      </div>
+      <div class="card-body p-4">
+        {% if assembly_data %}
+          <div class="row g-3">
+            {% for item in assembly_data %}
+            <div class="col-md-6 col-lg-4">
+              <div class="vehicle-card card bg-dark bg-opacity-50 border-0 shadow-sm rounded-4 p-3" onclick="toggleDetail('vehicle-{{ item.assembly.id }}')">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <h5 class="fw-bold m-0 text-white">
+                      {% if item.assembly.vehicle.image %}
+                        <img src="{{ item.assembly.vehicle.image.url }}" alt="" style="width:28px;height:28px;object-fit:contain;" class="me-1">
+                      {% else %}
+                        <i class="fas fa-rocket text-info me-1"></i>
+                      {% endif %}
+                      {{ item.assembly.vehicle.name }}
+                    </h5>
+                    <small class="text-muted">#{{ item.assembly.vehicle.progression_order }}</small>
+                  </div>
+                  {% if item.assembly.is_completed %}
+                    <span class="badge bg-success rounded-pill px-3"><i class="fas fa-check me-1"></i>مكتملة</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark rounded-pill px-3"><i class="fas fa-wrench me-1"></i>قيد التجميع</span>
+                  {% endif %}
+                </div>
+
+                <!-- Power bar -->
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <small class="text-muted">القوة:</small>
+                  <div class="flex-grow-1 req-bar">
+                    <div class="req-bar-fill bg-info" style="width: {{ item.assembly.power_percentage|floatformat:0 }}%;"></div>
+                  </div>
+                  <small class="fw-bold text-info">{{ item.assembly.power_percentage|floatformat:1 }}%</small>
+                </div>
+
+                {% if item.assembly.is_completed and item.assembly.completed_at %}
+                <small class="text-muted"><i class="far fa-clock me-1"></i>اكتملت في: {{ item.assembly.completed_at|date:"Y-m-d H:i" }}</small>
+                {% endif %}
+
+                <div class="text-center mt-2">
+                  <small class="text-muted"><i class="fas fa-chevron-down" id="chevron-vehicle-{{ item.assembly.id }}"></i></small>
+                </div>
+              </div>
+
+              <!-- Expandable Detail -->
+              <div class="vehicle-detail" id="vehicle-{{ item.assembly.id }}">
+                <div class="card bg-dark bg-opacity-25 border border-info border-opacity-25 rounded-4 p-3 mt-2">
+                  
+                  <!-- Requirements Progress -->
+                  <h6 class="fw-bold text-info mb-3"><i class="fas fa-list-check me-1"></i>المتطلبات</h6>
+                  {% for req in item.requirements %}
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    {% if req.done %}
+                      <i class="fas fa-check-circle text-success"></i>
+                    {% else %}
+                      <i class="far fa-circle text-muted"></i>
+                    {% endif %}
+                    <span class="flex-grow-1">{{ req.type }}</span>
+                    <span class="badge {% if req.done %}bg-success{% else %}bg-secondary{% endif %}">{{ req.allocated }}/{{ req.required }}</span>
+                  </div>
+                  {% endfor %}
+
+                  {% if item.components %}
+                  <!-- Allocated Components -->
+                  <h6 class="fw-bold text-warning mt-3 mb-2"><i class="fas fa-puzzle-piece me-1"></i>المكونات المركبة</h6>
+                  <div class="d-flex flex-wrap">
+                    {% for comp in item.components %}
+                    <div class="component-chip">
+                      <i class="fas fa-cog text-warning"></i>
+                      <div>
+                        <div class="fw-bold text-white">{{ comp.name }}</div>
+                        <small class="text-muted">{{ comp.type }} · قوة {{ comp.power }} · ×{{ comp.quantity }}</small>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+
+                  {% if item.total_cost %}
+                  <div class="mt-3 pt-2 border-top border-secondary">
+                    <small class="text-muted"><i class="fas fa-coins text-warning me-1"></i>التكلفة الإجمالية: <strong class="text-warning">${{ item.total_cost }}</strong></small>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <i class="fas fa-hammer fs-1 text-muted mb-3 opacity-50"></i>
+            <h5 class="fw-bold text-muted">لا توجد مركبات</h5>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
     <div class="row g-4">
-      
-      <!-- Purchased Components -->
-      <div class="col-lg-6">
+
+      <!-- ===== PURCHASES SECTION ===== -->
+      <div class="col-lg-7">
         <div class="card h-100 neo-card">
           <div class="card-header bg-transparent border-0 pt-4 pb-2 px-4">
-            <h4 class="fw-bold m-0"><i class="fas fa-shopping-cart text-success me-2"></i>المشتريات</h4>
+            <h4 class="fw-bold m-0"><i class="fas fa-shopping-cart text-success me-2"></i>سجل المشتريات</h4>
           </div>
           <div class="card-body p-4">
             {% if purchases %}
@@ -23,8 +182,9 @@
                   <thead class="table-dark">
                     <tr>
                       <th>المكوّن</th>
+                      <th>النوع</th>
                       <th>السعر</th>
-                      <th>تاريخ الشراء</th>
+                      <th>التاريخ</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -33,20 +193,18 @@
                       <td>
                         <div class="d-flex align-items-center gap-2">
                           {% if p.component.image %}
-                            <img src="{{ p.component.image.url }}" alt="{{ p.component.name }}" class="rounded bg-white p-1" style="width: 40px; height: 40px; object-fit: contain;">
+                            <img src="{{ p.component.image.url }}" alt="" class="rounded bg-white p-1" style="width: 36px; height: 36px; object-fit: contain;">
                           {% else %}
-                            <div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                              <i class="fas fa-cogs text-white"></i>
+                            <div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                              <i class="fas fa-cogs text-white small"></i>
                             </div>
                           {% endif %}
-                          <div>
-                            <div class="fw-bold">{{ p.component.name }}</div>
-                            <small class="text-muted">{{ p.component.component_type.name }}</small>
-                          </div>
+                          <strong>{{ p.component.name }}</strong>
                         </div>
                       </td>
+                      <td><small class="text-muted">{{ p.component.component_type.name }}</small></td>
                       <td><span class="badge badge-soft-success">${{ p.price_paid }}</span></td>
-                      <td><small class="text-muted">{{ p.purchased_at|date:"Y-m-d H:i" }}</small></td>
+                      <td><small class="text-muted">{{ p.purchased_at|date:"m/d H:i" }}</small></td>
                     </tr>
                     {% endfor %}
                   </tbody>
@@ -55,48 +213,67 @@
             {% else %}
               <div class="text-center py-5">
                 <i class="fas fa-box-open fs-1 text-muted mb-3 opacity-50"></i>
-                <h5 class="fw-bold text-muted">لا توجد مشتريات</h5>
-                <p class="text-muted small">لم تقم بشراء أي مكونات بعد.</p>
+                <h5 class="fw-bold text-muted">لا توجد مشتريات بعد</h5>
               </div>
             {% endif %}
           </div>
         </div>
       </div>
 
-      <!-- Completed Vehicles Timeline -->
-      <div class="col-lg-6">
+      <!-- ===== TRAVEL HISTORY ===== -->
+      <div class="col-lg-5">
         <div class="card h-100 neo-card">
           <div class="card-header bg-transparent border-0 pt-4 pb-2 px-4">
-            <h4 class="fw-bold m-0"><i class="fas fa-ship text-info me-2"></i>المركبات المكتملة</h4>
+            <h4 class="fw-bold m-0"><i class="fas fa-route text-cyan me-2" style="color: #06b6d4;"></i>سجل الرحلات</h4>
           </div>
           <div class="card-body p-4">
-            {% if assemblies %}
-              <div class="timeline position-relative ps-4 border-start border-info border-2">
-                {% for a in assemblies %}
-                <div class="mb-4 position-relative">
-                  <div class="position-absolute bg-info rounded-circle shadow" style="width: 16px; height: 16px; left: -25px; top: 5px;"></div>
-                  <div class="card bg-dark bg-opacity-50 border-0 shadow-sm p-3 rounded-4">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                      <h5 class="fw-bold m-0 text-white">{{ a.vehicle.name }}</h5>
-                      <span class="badge bg-success rounded-pill px-3"><i class="fas fa-check me-1"></i>مكتملة</span>
-                    </div>
-                    <p class="small text-muted mb-0"><i class="far fa-clock me-1"></i>اكتملت في: {{ a.completed_at|date:"Y-m-d H:i" }}</p>
+            {% if travels %}
+              {% for t in travels %}
+              <div class="travel-line mb-3 pb-3">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <strong class="text-white">{{ t.from_island.name }}</strong>
+                    <i class="fas fa-arrow-left text-info mx-2"></i>
+                    <strong class="text-white">{{ t.to_island.name }}</strong>
                   </div>
                 </div>
-                {% endfor %}
+                <div class="d-flex gap-3 mt-1">
+                  <small class="text-muted"><i class="fas fa-ship me-1"></i>{{ t.vehicle.name }}</small>
+                  <small class="text-muted"><i class="fas fa-clock me-1"></i>{{ t.actual_travel_time_minutes|floatformat:1 }} دقيقة</small>
+                  {% if t.delay_minutes > 0 %}
+                  <small class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i>+{{ t.delay_minutes|floatformat:1 }} تأخير</small>
+                  {% endif %}
+                </div>
+                <small class="text-muted">{{ t.departed_at|date:"Y-m-d H:i" }}</small>
               </div>
+              {% endfor %}
             {% else %}
               <div class="text-center py-5">
-                <i class="fas fa-hammer fs-1 text-muted mb-3 opacity-50"></i>
-                <h5 class="fw-bold text-muted">لم يتم إكمال أي مركبة</h5>
-                <p class="text-muted small">ابدأ بجمع المكونات لإكمال مركبتك الأولى.</p>
+                <i class="fas fa-compass fs-1 text-muted mb-3 opacity-50"></i>
+                <h5 class="fw-bold text-muted">لا توجد رحلات بعد</h5>
+                <p class="text-muted small">أكمل مركبتك الأولى لبدء الرحلة!</p>
               </div>
             {% endif %}
           </div>
         </div>
       </div>
-      
+
     </div>
   </div>
 </section>
+
+<script>
+function toggleDetail(id) {
+  const el = document.getElementById(id);
+  const chevron = document.getElementById('chevron-' + id);
+  el.classList.toggle('show');
+  if (el.classList.contains('show')) {
+    chevron.classList.remove('fa-chevron-down');
+    chevron.classList.add('fa-chevron-up');
+  } else {
+    chevron.classList.remove('fa-chevron-up');
+    chevron.classList.add('fa-chevron-down');
+  }
+}
+</script>
 {% endblock body %}
