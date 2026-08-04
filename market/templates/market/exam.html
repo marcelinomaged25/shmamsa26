@@ -43,7 +43,16 @@
         </div>
       </div>
 
-      <form method="post" id="examForm">
+      <div id="startExamContainer" class="text-center my-5 fade-in-up">
+        <h4 class="mb-4">هل أنت مستعد لبدء الاختبار؟</h4>
+        <button id="startExamBtn" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow fw-bold fs-5">
+          <i class="fas fa-play me-2"></i> بدء الاختبار الآن
+        </button>
+        <p class="text-muted mt-3 small"><i class="fas fa-exclamation-triangle me-1"></i> سيبدأ العداد التنازلي فور النقر على الزر ولن تتمكن من إيقافه.</p>
+      </div>
+
+      <div id="examContentWrapper" style="display: none;">
+        <form method="post" id="examForm">
         {% csrf_token %}
         <input type="hidden" name="duration_seconds" id="durationSecondsInput" value="0">
 
@@ -77,6 +86,7 @@
           <i class="fas fa-paper-plane me-2"></i> تسليم إجابات الاختبار
         </button>
       </form>
+      </div>
     {% endif %}
   </div>
 </section>
@@ -87,10 +97,14 @@
   const timerEl = document.getElementById('examTimer');
   const examForm = document.getElementById('examForm');
   const durationInput = document.getElementById('durationSecondsInput');
+  const startBtn = document.getElementById('startExamBtn');
+  const startContainer = document.getElementById('startExamContainer');
+  const examWrapper = document.getElementById('examContentWrapper');
 
-  if (timerEl && examForm) {
+  if (timerEl && examForm && startBtn) {
     let remaining = parseInt(timerEl.dataset.duration, 10) || 300;
     let elapsed = 0;
+    let tick;
 
     const formatTime = (secs) => {
       const m = Math.floor(secs / 60).toString().padStart(2, '0');
@@ -100,19 +114,26 @@
 
     timerEl.textContent = formatTime(remaining);
 
-    const tick = setInterval(() => {
-      remaining -= 1;
-      elapsed += 1;
-      if (durationInput) durationInput.value = elapsed;
+    startBtn.addEventListener('click', () => {
+      // Hide start container, show exam
+      startContainer.style.display = 'none';
+      examWrapper.style.display = 'block';
 
-      if (remaining <= 0) {
-        clearInterval(tick);
-        timerEl.textContent = '00:00';
-        examForm.submit();
-        return;
-      }
-      timerEl.textContent = formatTime(remaining);
-    }, 1000);
+      // Start timer
+      tick = setInterval(() => {
+        remaining -= 1;
+        elapsed += 1;
+        if (durationInput) durationInput.value = elapsed;
+
+        if (remaining <= 0) {
+          clearInterval(tick);
+          timerEl.textContent = '00:00';
+          examForm.submit();
+          return;
+        }
+        timerEl.textContent = formatTime(remaining);
+      }, 1000);
+    });
   }
 </script>
 {% endblock extra_js %}
