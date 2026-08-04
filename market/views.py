@@ -20,6 +20,7 @@ from .models import (
     TeamVehicleAssembly,
     TeamComponentAllocation,
     TravelHistory,
+    PurchaseHistory,
     ExamCategory,
     LiveExam,
     ExamQuestion,
@@ -231,10 +232,40 @@ def buy_component(request, power_level_id):
     inv_item.quantity += 1
     inv_item.save()
 
+    # Record the purchase history
+    PurchaseHistory.objects.create(
+        profile=profile,
+        component=comp,
+        price_paid=comp.price
+    )
+
     messages.success(request, f'تم شراء قطعة واحدة من {comp.name} مقابل ${comp.price}.')
     _create_notification(profile, 'Component Purchased', f'Purchased 1x {comp.name} for ${comp.price}.')
     return redirect('market:team_shop')
 
+@login_required
+def team_history(request):
+    profile = get_object_or_404(Profile, user=request.user)
+    
+    # Get purchased components
+    purchases = PurchaseHistory.objects.filter(profile=profile).select_related('component', 'component__component_type').order_by('-purchased_at')
+    
+    # Get completed vehicle assemblies
+    assemblies = TeamVehicleAssembly.objects.filter(
+        profile=profile, 
+        is_completed=True
+    ).select_related('vehicle').order_by('-completed_at')
+    
+    # Get travel history for a complete timeline
+    travels = TravelHistory.objects.filter(profile=profile).select_related('from_island', 'to_island', 'vehicle').order_by('-departed_at')
+    
+    return render(request, 'market/history.html', {
+        'profile': profile,
+        'purchases': purchases,
+        'assemblies': assemblies,
+        'travels': travels,
+        'comp_state': _get_competition_state(),
+    })
 
 @login_required
 def return_component(request, power_level_id):

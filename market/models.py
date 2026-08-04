@@ -122,6 +122,19 @@ class InventoryItem(models.Model):
         return f"{self.profile.teamName or self.profile.user.username}: {self.quantity}x {self.power_level.name}"
 
 
+class PurchaseHistory(models.Model):
+    profile = models.ForeignKey('accounts.Profile', on_delete=models.CASCADE, related_name='purchase_histories')
+    component = models.ForeignKey(ComponentPowerLevel, on_delete=models.CASCADE)
+    price_paid = models.DecimalField(max_digits=12, decimal_places=2)
+    purchased_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-purchased_at']
+
+    def __str__(self):
+        return f"{self.profile.teamName or self.profile.user.username} bought {self.component.name} for ${self.price_paid}"
+
+
 class TeamVehicleAssembly(models.Model):
     profile = models.ForeignKey('accounts.Profile', on_delete=models.CASCADE, related_name='vehicle_assemblies')
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)

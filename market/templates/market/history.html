@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}سجل النشاط - شماس محظوظ{% endblock title %}
+{% block body %}
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="fw-extrabold text-white"><i class="fas fa-history text-primary me-2"></i> سجل النشاط</h1>
+      <a href="{% url 'market:team_dashboard' %}" class="btn btn-outline-light fw-bold"><i class="fas fa-arrow-right me-1"></i> العودة للوحة التحكم</a>
+    </div>
+
+    <div class="row g-4">
+      
+      <!-- Purchased Components -->
+      <div class="col-lg-6">
+        <div class="card h-100 neo-card">
+          <div class="card-header bg-transparent border-0 pt-4 pb-2 px-4">
+            <h4 class="fw-bold m-0"><i class="fas fa-shopping-cart text-success me-2"></i>المشتريات</h4>
+          </div>
+          <div class="card-body p-4">
+            {% if purchases %}
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>المكوّن</th>
+                      <th>السعر</th>
+                      <th>تاريخ الشراء</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for p in purchases %}
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center gap-2">
+                          {% if p.component.image %}
+                            <img src="{{ p.component.image.url }}" alt="{{ p.component.name }}" class="rounded bg-white p-1" style="width: 40px; height: 40px; object-fit: contain;">
+                          {% else %}
+                            <div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                              <i class="fas fa-cogs text-white"></i>
+                            </div>
+                          {% endif %}
+                          <div>
+                            <div class="fw-bold">{{ p.component.name }}</div>
+                            <small class="text-muted">{{ p.component.component_type.name }}</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td><span class="badge badge-soft-success">${{ p.price_paid }}</span></td>
+                      <td><small class="text-muted">{{ p.purchased_at|date:"Y-m-d H:i" }}</small></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <div class="text-center py-5">
+                <i class="fas fa-box-open fs-1 text-muted mb-3 opacity-50"></i>
+                <h5 class="fw-bold text-muted">لا توجد مشتريات</h5>
+                <p class="text-muted small">لم تقم بشراء أي مكونات بعد.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Completed Vehicles Timeline -->
+      <div class="col-lg-6">
+        <div class="card h-100 neo-card">
+          <div class="card-header bg-transparent border-0 pt-4 pb-2 px-4">
+            <h4 class="fw-bold m-0"><i class="fas fa-ship text-info me-2"></i>المركبات المكتملة</h4>
+          </div>
+          <div class="card-body p-4">
+            {% if assemblies %}
+              <div class="timeline position-relative ps-4 border-start border-info border-2">
+                {% for a in assemblies %}
+                <div class="mb-4 position-relative">
+                  <div class="position-absolute bg-info rounded-circle shadow" style="width: 16px; height: 16px; left: -25px; top: 5px;"></div>
+                  <div class="card bg-dark bg-opacity-50 border-0 shadow-sm p-3 rounded-4">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <h5 class="fw-bold m-0 text-white">{{ a.vehicle.name }}</h5>
+                      <span class="badge bg-success rounded-pill px-3"><i class="fas fa-check me-1"></i>مكتملة</span>
+                    </div>
+                    <p class="small text-muted mb-0"><i class="far fa-clock me-1"></i>اكتملت في: {{ a.completed_at|date:"Y-m-d H:i" }}</p>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="text-center py-5">
+                <i class="fas fa-hammer fs-1 text-muted mb-3 opacity-50"></i>
+                <h5 class="fw-bold text-muted">لم يتم إكمال أي مركبة</h5>
+                <p class="text-muted small">ابدأ بجمع المكونات لإكمال مركبتك الأولى.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+{% endblock body %}

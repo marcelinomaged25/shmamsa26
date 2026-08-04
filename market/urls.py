@@ -9,6 +9,7 @@ urlpatterns = [
     path('leaderboard/', views.leaderboard, name='leaderboard'),
     path('api/leaderboard/', views.api_leaderboard, name='api_leaderboard'),
     path('dashboard/', views.team_dashboard, name='team_dashboard'),
+    path('history/', views.team_history, name='team_history'),
     path('shop/', views.team_shop, name='team_shop'),
     path('buy/<int:power_level_id>/', views.buy_component, name='buy_component'),
     path('return/<int:power_level_id>/', views.return_component, name='return_component'),

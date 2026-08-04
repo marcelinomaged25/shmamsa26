@@ -438,10 +438,41 @@
       border-color: rgba(245, 158, 11, 0.15);
     }
 
-    .card, .table, .list-group-item, .dropdown-menu {
+    .card, .list-group-item, .dropdown-menu {
       background-color: var(--bg-elevated);
       color: var(--text-body);
       border-color: var(--glass-border);
+    }
+    
+    .table {
+      --bs-table-bg: transparent;
+      --bs-table-color: var(--text-body);
+      --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+      --bs-table-striped-color: var(--text-body);
+      --bs-table-hover-bg: var(--glass-hover);
+      --bs-table-hover-color: var(--text-body);
+      background-color: transparent !important;
+      color: var(--text-body) !important;
+      border-color: var(--glass-border);
+    }
+    
+    .table>tbody>tr>*, .table-striped>tbody>tr:nth-of-type(odd)>*, .table-hover>tbody>tr:hover>* {
+      background-color: var(--bs-table-bg) !important;
+      color: var(--bs-table-color) !important;
+    }
+
+    .modal-content {
+      background-color: var(--bg-elevated);
+      color: var(--text-body);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .modal-header, .modal-footer {
+      border-color: var(--glass-border);
+    }
+    .modal-title {
+      color: var(--text-primary);
     }
 
     .card {
@@ -1029,6 +1060,7 @@
 
           {% if user.is_authenticated %}
           <li><a class="neo-nav-link" href="{% url 'market:team_dashboard' %}"><i class="fas fa-gauge-high"></i> <span>لوحة التحكم</span></a></li>
+          <li><a class="neo-nav-link" href="{% url 'market:team_history' %}"><i class="fas fa-history"></i> <span>سجل النشاط</span></a></li>
           <li><a class="neo-nav-link" href="{% url 'market:team_shop' %}"><i class="fas fa-microchip"></i> <span>المتجر</span></a></li>
           <li><a class="neo-nav-link" href="{% url 'market:vehicle_assembly' %}"><i class="fas fa-wrench"></i> <span>التجميع</span></a></li>
           <li><a class="neo-nav-link" href="{% url 'market:live_exam' %}"><i class="fas fa-bolt"></i> <span>الاختبارات</span></a></li>
