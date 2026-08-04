@@ -17,3 +17,5 @@ tzdata==2026.3
 whitenoise==6.12.0
 python-dotenv==1.2.2
 psycopg2-binary==2.9.12
+cloudinary==1.38.0
+django-cloudinary-storage==0.3.0
