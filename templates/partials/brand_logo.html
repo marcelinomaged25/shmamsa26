@@ -1,59 +1,6 @@
-{# Premium Arabic brand logo: treasure chest + seven gems #}
+{% load static %}
 <span class="neo-brand-icon" aria-hidden="true">
-  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="">
-    <defs>
-      <linearGradient id="chestGrad" x1="8" y1="28" x2="40" y2="44" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stop-color="#92400E"/>
-        <stop offset="100%" stop-color="#451A03"/>
-      </linearGradient>
-      <linearGradient id="lidGrad" x1="10" y1="16" x2="38" y2="28" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stop-color="#B45309"/>
-        <stop offset="100%" stop-color="#78350F"/>
-      </linearGradient>
-      <linearGradient id="goldTrim" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#FBBF24"/>
-        <stop offset="50%" stop-color="#FDE68A"/>
-        <stop offset="100%" stop-color="#FBBF24"/>
-      </linearGradient>
-      <filter id="gemGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="1.2" result="blur"/>
-        <feMerge>
-          <feMergeNode in="blur"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
-    </defs>
-
-    <!-- Chest body -->
-    <rect x="7" y="26" width="34" height="16" rx="3" fill="url(#chestGrad)" stroke="url(#goldTrim)" stroke-width="1.2"/>
-    <!-- Chest lid -->
-    <path d="M9 26 C9 19 14 14 24 14 C34 14 39 19 39 26 Z" fill="url(#lidGrad)" stroke="url(#goldTrim)" stroke-width="1.2"/>
-    <!-- Lock plate -->
-    <rect x="21" y="22" width="6" height="7" rx="1" fill="#FBBF24"/>
-    <circle cx="24" cy="25" r="1.2" fill="#451A03"/>
-
-    <!-- Seven glowing gems -->
-    <g filter="url(#gemGlow)">
-      <circle cx="12" cy="11" r="2.2" fill="#FBBF24" opacity="0.95"/>
-      <circle cx="17" cy="8"  r="2"   fill="#EF4444" opacity="0.95"/>
-      <circle cx="22" cy="7"  r="2.2" fill="#22D3EE" opacity="0.95"/>
-      <circle cx="27" cy="7"  r="2.2" fill="#A78BFA" opacity="0.95"/>
-      <circle cx="32" cy="8"  r="2"   fill="#34D399" opacity="0.95"/>
-      <circle cx="36" cy="11" r="2.2" fill="#F472B6" opacity="0.95"/>
-      <circle cx="24" cy="10" r="2.4" fill="#FDE68A" opacity="1"/>
-    </g>
-
-    <!-- Gem highlights -->
-    <g opacity="0.7">
-      <circle cx="11.5" cy="10.5" r="0.6" fill="#fff"/>
-      <circle cx="21.5" cy="6.5"  r="0.6" fill="#fff"/>
-      <circle cx="24"   cy="9.5"  r="0.7" fill="#fff"/>
-      <circle cx="35.5" cy="10.5" r="0.6" fill="#fff"/>
-    </g>
-
-    <!-- Chest band -->
-    <rect x="7" y="31" width="34" height="2.5" fill="url(#goldTrim)" opacity="0.85"/>
-  </svg>
+  <img src="{% static 'logo.png' %}" alt="شماس محظوظ" style="width: 100%; height: 100%; object-fit: contain;">
 </span>
 <span class="neo-brand-text">
   <span class="neo-brand-title">شماس محظوظ</span>

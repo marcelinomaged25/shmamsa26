@@ -13,7 +13,7 @@
   </thead>
   <tbody>
     {% for team in leaderboard %}
-    <tr class="{% if team.rank == 1 %}table-warning fw-bold{% elif team.rank == 2 %}table-light{% elif team.rank == 3 %}table-light{% endif %}">
+    <tr class="{% if team.rank == 1 %}bg-warning bg-opacity-10 fw-bold border-warning border-start border-4{% elif team.rank == 2 %}bg-secondary bg-opacity-10 border-secondary border-start border-4{% elif team.rank == 3 %}bg-secondary bg-opacity-10 border-secondary border-start border-4{% endif %}">
       <td>
         <span class="fw-bold">#{{ team.rank }}</span>
       </td>
