@@ -62,17 +62,19 @@ class Profile(models.Model):
     @property
     def current_vehicle_assembly(self):
         from market.models import Vehicle, TeamVehicleAssembly
-        # Progression strictly Submarine (1) -> Boat (2) -> Car (3) -> Airplane (4) -> Horse Carriage (5) -> Train (6) -> Bicycle (7)
-        for order in range(1, 8):
-            vehicle = Vehicle.objects.filter(progression_order=order).first()
-            if vehicle:
-                assembly, _ = TeamVehicleAssembly.objects.get_or_create(profile=self, vehicle=vehicle)
-                if not assembly.is_completed:
-                    return assembly
-        # If all 7 completed, return the last one
-        last_vehicle = Vehicle.objects.filter(progression_order=7).first()
-        if last_vehicle:
-            return TeamVehicleAssembly.objects.filter(profile=self, vehicle=last_vehicle).first()
+        # Tie active vehicle strictly to travel progression.
+        # If 0 travels, they must work on vehicle 1. 
+        # If 1 travel, they must work on vehicle 2.
+        active_order = self.travel_histories.count() + 1
+        
+        # Max out at 7
+        if active_order > 7:
+            active_order = 7
+            
+        vehicle = Vehicle.objects.filter(progression_order=active_order).first()
+        if vehicle:
+            assembly, _ = TeamVehicleAssembly.objects.get_or_create(profile=self, vehicle=vehicle)
+            return assembly
         return None
 
     @property

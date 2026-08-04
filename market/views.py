@@ -460,8 +460,8 @@ def travel_island(request):
         messages.error(request, 'يجب إكمال تجميع المركبة الحالية قبل الانتقال إلى الجزيرة التالية.')
         return redirect('market:vehicle_assembly')
 
-    # Get the latest completed assembly for travel stats
-    prev_assembly = TeamVehicleAssembly.objects.filter(profile=profile, is_completed=True).order_by('-vehicle__progression_order').first()
+    # Get the current vehicle assembly (which must be completed to travel)
+    prev_assembly = profile.current_vehicle_assembly
 
     # Get current island or start at Island #1
     current_island = profile.current_island
