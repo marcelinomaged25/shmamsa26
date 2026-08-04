@@ -5,7 +5,7 @@
   {% load static %}
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DevTune | {% block title %}الرئيسية{% endblock title %}</title>
+  <title>شماس محظوظ | {% block title %}الرئيسية{% endblock title %}</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,6 +21,8 @@
       --glass-bg: rgba(255, 255, 255, 0.045);
       --glass-border: rgba(255, 255, 255, 0.08);
       --glass-hover: rgba(255, 255, 255, 0.08);
+      --gold: #FBBF24;
+      --gold-light: #FDE68A;
       --amber: #ffb547;
       --amber-dim: #e6961f;
       --amber-glow: rgba(255, 181, 71, 0.16);
@@ -147,26 +149,72 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-direction: row-reverse;
+      flex-direction: row;
+      gap: 16px;
+    }
+
+    .neo-nav-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      justify-content: flex-end;
+      min-width: 0;
     }
 
     .neo-brand {
-      font-family: var(--font-display);
-      font-size: 1.2rem;
-      font-weight: 900;
-      color: var(--amber);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       text-decoration: none;
-      letter-spacing: 0.05em;
+      flex-shrink: 0;
+      transition: opacity 0.25s ease, transform 0.25s ease;
     }
 
-    .neo-brand:hover { color: var(--amber); }
+    .neo-brand:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
 
-    .neo-brand i {
-      font-size: 1.5rem;
-      color: var(--cyan);
+    .neo-brand-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+    }
+
+    .neo-brand-icon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .neo-brand-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      line-height: 1.2;
+      gap: 1px;
+    }
+
+    .neo-brand-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+
+    .neo-brand-subtitle {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.03em;
+      white-space: nowrap;
     }
 
     .neo-nav-links {
@@ -226,6 +274,10 @@
 
     @media (max-width: 991px) {
       .neo-menu-toggle { display: block; }
+      .neo-nav-left {
+        flex: 0 0 auto;
+        justify-content: flex-end;
+      }
       .neo-nav-collapse {
         display: none;
         position: absolute;
@@ -242,6 +294,14 @@
         gap: 2px;
       }
       .neo-nav-link { padding: 12px 16px; }
+      .neo-brand-title { font-size: 0.95rem; }
+      .neo-brand-subtitle { font-size: 0.68rem; }
+      .neo-brand-icon { width: 38px; height: 38px; }
+    }
+
+    @media (max-width: 575px) {
+      .neo-brand-subtitle { display: none; }
+      .neo-brand-icon { width: 34px; height: 34px; }
     }
 
     /* Notification Bell */
@@ -955,19 +1015,16 @@
 
 <body>
   <!-- ===== NAVBAR ===== -->
-  <nav class="neo-nav">
+  <nav class="neo-nav" aria-label="التنقل الرئيسي">
     <div class="neo-nav-inner">
-      <a href="{% url 'market:leaderboard' %}" class="neo-brand">
-        <i class="fas fa-rocket"></i> DEVTUNE
+      <a href="{% url 'market:leaderboard' %}" class="neo-brand" aria-label="شماس محظوظ بـ 7 كنوز — الصفحة الرئيسية">
+        {% include "partials/brand_logo.html" %}
       </a>
 
-      <button class="neo-menu-toggle" onclick="document.getElementById('navCollapse').classList.toggle('show')">
-        <i class="fas fa-bars"></i>
-      </button>
-
-      <div class="neo-nav-collapse" id="navCollapse">
-        <ul class="neo-nav-links">
-          <li><a class="neo-nav-link" href="{% url 'market:leaderboard' %}"><i class="fas fa-trophy"></i> <span>الترتيب</span></a></li>
+      <div class="neo-nav-left">
+        <div class="neo-nav-collapse" id="navCollapse">
+          <ul class="neo-nav-links">
+          <li><a class="neo-nav-link" href="{% url 'market:leaderboard' %}"><i class="fas fa-trophy"></i> <span>لوحة الترتيب</span></a></li>
 
           {% if user.is_authenticated %}
           <li><a class="neo-nav-link" href="{% url 'market:team_dashboard' %}"><i class="fas fa-gauge-high"></i> <span>لوحة التحكم</span></a></li>
@@ -1034,7 +1091,12 @@
           <li><a class="neo-btn neo-btn-primary neo-btn-sm" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> دخول</a></li>
           <li><a class="neo-btn neo-btn-secondary neo-btn-sm" href="{% url 'accounts:signup' %}"><i class="fas fa-user-plus"></i> تسجيل</a></li>
           {% endif %}
-        </ul>
+          </ul>
+        </div>
+
+        <button class="neo-menu-toggle" type="button" aria-label="فتح القائمة" aria-expanded="false" aria-controls="navCollapse" onclick="document.getElementById('navCollapse').classList.toggle('show'); this.setAttribute('aria-expanded', document.getElementById('navCollapse').classList.contains('show'))">
+          <i class="fas fa-bars"></i>
+        </button>
       </div>
     </div>
   </nav>
