@@ -85,7 +85,6 @@
           {% if profile.user == request.user %}
           <div class="pt-3 border-top d-flex gap-2 flex-wrap">
             <a href="{% url 'accounts:profile_edit' %}" class="btn btn-outline-primary"><i class="fas fa-pen me-1"></i> تعديل الملف</a>
-            <a href="{% url 'accounts:del_account' profile.slug %}" class="btn btn-outline-danger" onclick="return confirm('هل أنت متأكد من حذف الحساب؟');"><i class="fas fa-trash me-1"></i> حذف الحساب</a>
           </div>
           {% endif %}
         </div>
